@@ -1,0 +1,146 @@
+// Flat config for the monorepo.
+// Package-specific overrides live in each package's eslint.config.js.
+import eslint from '@eslint/js';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import tseslint from 'typescript-eslint';
+import stylistic from '@stylistic/eslint-plugin';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import elseIfSameLine from './custom-eslint-rules/else-if-same-line.js';
+import ifParenSameLine from './custom-eslint-rules/if-paren-same-line.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const toFlatConfigArray = (config) => Array.isArray(config) ? config : [config];
+
+export default [
+  eslint.configs.recommended,
+  ...toFlatConfigArray(tseslint.configs.strict),
+  ...toFlatConfigArray(tseslint.configs.stylistic),
+  ...tsPlugin.configs['flat/strict'],
+  {
+    files: ['**/*.{ts,js}'],
+    plugins: {
+      '@stylistic': stylistic,
+      custom: {
+        rules: {
+          'else-if-same-line': elseIfSameLine,
+          'if-paren-same-line': ifParenSameLine,
+        },
+      },
+    },
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        tsconfigRootDir: __dirname,
+      },
+    },
+    rules: {
+      '@stylistic/array-bracket-newline': ['error', 'consistent'],
+      '@stylistic/array-bracket-spacing': 'error',
+      '@stylistic/array-element-newline': ['error', 'consistent'],
+      '@stylistic/arrow-parens': 'error',
+      '@stylistic/arrow-spacing': 'error',
+      '@stylistic/block-spacing': 'error',
+      '@stylistic/brace-style': 'error',
+      '@stylistic/comma-dangle': ['error', 'always-multiline'],
+      '@stylistic/comma-spacing': 'error',
+      '@stylistic/comma-style': 'error',
+      '@stylistic/computed-property-spacing': 'error',
+      '@stylistic/curly-newline': ['error', { consistent: true }],
+      '@stylistic/eol-last': 'error',
+      '@stylistic/function-call-argument-newline': ['error', 'consistent'],
+      '@stylistic/function-call-spacing': 'error',
+      '@stylistic/function-paren-newline': ['error', 'multiline-arguments'],
+      '@stylistic/implicit-arrow-linebreak': 'error',
+      '@stylistic/indent': ['error', 2],
+      '@stylistic/indent-binary-ops': ['error', 2],
+      '@stylistic/key-spacing': ['error', { beforeColon: false, afterColon: true, mode: 'strict' }],
+      '@stylistic/keyword-spacing': 'error',
+      '@stylistic/lines-between-class-members': [
+        'error',
+        {
+          enforce: [
+            { blankLine: 'never', prev: 'field', next: 'field' },
+            { blankLine: 'always', prev: '*', next: 'method' },
+          ],
+        },
+        { exceptAfterOverload: true },
+      ],
+      '@stylistic/max-len': ['error', { code: 120, ignoreTrailingComments: true, ignoreUrls: true }],
+      '@stylistic/max-statements-per-line': 'error',
+      '@stylistic/member-delimiter-style': 'error',
+      '@stylistic/new-parens': 'error',
+      // '@stylistic/newline-per-chained-call': ['error', { ignoreChainWithDepth: 2 }],
+      '@stylistic/no-extra-parens': 'error',
+      '@stylistic/no-extra-semi': 'error',
+      '@stylistic/no-floating-decimal': 'error',
+      '@stylistic/no-mixed-operators': 'error',
+      '@stylistic/no-multi-spaces': 'error',
+      '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0 }],
+      '@stylistic/no-tabs': 'error',
+      '@stylistic/no-trailing-spaces': 'error',
+      '@stylistic/no-whitespace-before-property': 'error',
+      '@stylistic/nonblock-statement-body-position': ['error', 'beside'],
+      '@stylistic/object-curly-newline': ['error', { multiline: true, consistent: true }],
+      '@stylistic/object-curly-spacing': ['error', 'always'],
+      '@stylistic/one-var-declaration-per-line': 'error',
+      '@stylistic/operator-linebreak': ['error', 'after'],
+      '@stylistic/padded-blocks': ['error', 'never'],
+      '@stylistic/padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: ['const', 'let'], next: '*' },
+        { blankLine: 'always', prev: '*', next: ['const', 'let'] },
+        { blankLine: 'any', prev: ['const', 'let'], next: ['const', 'let'] },
+        { blankLine: 'always', prev: ['case', 'default'], next: '*' },
+      ],
+      '@stylistic/quote-props': ['error', 'as-needed'],
+      '@stylistic/quotes': ['error', 'single', { avoidEscape: true, allowTemplateLiterals: 'always' }],
+      '@stylistic/rest-spread-spacing': 'error',
+      '@stylistic/semi': 'error',
+      '@stylistic/semi-spacing': 'error',
+      '@stylistic/semi-style': 'error',
+      '@stylistic/space-before-blocks': 'error',
+      '@stylistic/space-before-function-paren': ['error', {
+        anonymous: 'always',
+        asyncArrow: 'always',
+        catch: 'always',
+        named: 'never',
+      }],
+      '@stylistic/space-in-parens': 'error',
+      '@stylistic/space-infix-ops': 'error',
+      '@stylistic/space-unary-ops': ['error', { words: true, nonwords: false }],
+      '@stylistic/spaced-comment': 'error',
+      '@stylistic/switch-colon-spacing': 'error',
+      '@stylistic/template-curly-spacing': 'error',
+      '@stylistic/type-annotation-spacing': 'error',
+      '@stylistic/type-generic-spacing': 'error',
+      '@stylistic/type-named-tuple-spacing': 'error',
+      '@stylistic/wrap-iife': [2, 'inside', { functionPrototypeMethods: true }],
+      '@stylistic/wrap-regex': 'error',
+      curly: 'error',
+      'one-var': ['error', 'never'],
+      eqeqeq: ['error', 'always'],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-debugger': 'error',
+      'no-lonely-if': 'error',
+      'no-nested-ternary': 'warn',
+      'no-param-reassign': 'error',
+      'no-unneeded-ternary': 'error',
+      'no-var': 'error',
+      'prefer-arrow-callback': 'error',
+      'prefer-const': 'error',
+      // Custom rules
+      'custom/else-if-same-line': 'error',
+      'custom/if-paren-same-line': 'error',
+    },
+  },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/.angular/**',
+      '**/.wrangler/**',
+      '**/coverage/**',
+    ],
+  },
+];

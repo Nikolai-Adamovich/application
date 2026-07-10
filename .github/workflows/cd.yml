@@ -1,0 +1,59 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+# Requires repository secrets:
+#   CLOUDFLARE_API_TOKEN  — Cloudflare API token with Pages + Workers permissions
+#   CLOUDFLARE_ACCOUNT_ID — Cloudflare account ID
+#   MONGODB_URI           — MongoDB Atlas connection string (Workers secret)
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    needs: []
+    # Only deploy after CI passes. CI runs on the same push event.
+    if: github.repository == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build --workspace @app/ui
+
+      - name: Deploy frontend to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: application-ui
+          directory: ui/dist
+
+      - name: Deploy backend to Cloudflare Workers
+        working-directory: server
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Set MongoDB secret
+        working-directory: server
+        run: npx wrangler secret put MONGODB_URI <<< "${{ secrets.MONGODB_URI }}"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

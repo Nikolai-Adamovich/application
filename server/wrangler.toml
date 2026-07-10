@@ -1,0 +1,16 @@
+name = "application-server"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# MongoDB connection string is stored as a Wrangler secret:
+#   wrangler secret put MONGODB_URI
+# Do not commit secrets to this file.
+
+[vars]
+# Non-secret configuration goes here.
+CORS_ORIGIN = "https://example.com"
+
+# Observability
+[observability]
+enabled = true
