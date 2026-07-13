@@ -1,18 +1,37 @@
 {
   "extends": "../tsconfig.base.json",
+  "compileOnSave": false,
   "compilerOptions": {
     "experimentalDecorators": true,
-    "useDefineForClassFields": false,
-    "target": "ES2022",
-    "module": "ES2022",
-    "moduleResolution": "Bundler",
+    "importHelpers": true,
+    "isolatedModules": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "preserve",
+    "moduleResolution": "Bundler",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
     "paths": {
       "@app/shared": ["../shared/src/index.ts"],
       "@app/shared/*": ["../shared/src/*"]
-    }
+    },
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
 }
