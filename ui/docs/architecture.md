@@ -121,5 +121,5 @@ import { ButtonModule } from 'primeng/button';
 - **Resources:** `src/app/data/*.test.ts`
 - **Services:** `src/app/services/*.test.ts` (planned)
 
-Tests use Vitest with `jsdom` environment. Use `TestBed` from `@angular/core/testing`
-for component tests requiring dependency injection.
+Tests use Vitest with `jsdom` environment. Use `TestBed` from `@angular/core/testing` for component tests requiring
+dependency injection.

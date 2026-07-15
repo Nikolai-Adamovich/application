@@ -22,16 +22,14 @@ server/src/
 
 ## MongoDB Connection Setup via `cloudflare:sockets` + `nodejs_compat`
 
-The official MongoDB Node.js driver requires TCP connectivity. Cloudflare Workers
-natively run on V8 isolates without TCP socket access. The connection is established
-using:
+The official MongoDB Node.js driver requires TCP connectivity. Cloudflare Workers natively run on V8 isolates without
+TCP socket access. The connection is established using:
 
 1. **`nodejs_compat` flag** - Enables Node.js compatibility layer in Wrangler
 2. **`cloudflare:sockets` API** - Exposes TCP sockets through Workers runtime
 3. **Custom connection options** - Routes TCP traffic through the socket API
 
-See ADR-0002 in [`docs/decisions.md`](../../docs/decisions.md) for the full
-rationale and fallback strategy.
+See ADR-0002 in [`docs/decisions.md`](../../docs/decisions.md) for the full rationale and fallback strategy.
 
 ## Data-Access Layer Interface and ADR-0002 Fallback Strategy
 
@@ -47,9 +45,8 @@ export interface DataStoreFactory {
 }
 ```
 
-**Fallback Strategy:** If `cloudflare:sockets` + MongoDB driver compatibility
-proves unstable, the data layer can be swapped to use MongoDB Atlas Data API
-(HTTP-based) without affecting services or routes.
+**Fallback Strategy:** If `cloudflare:sockets` + MongoDB driver compatibility proves unstable, the data layer can be
+swapped to use MongoDB Atlas Data API (HTTP-based) without affecting services or routes.
 
 ## Error Handling and Response Envelope Conventions
 
@@ -77,5 +74,4 @@ wrangler secret put MONGODB_URI
 - **Routes**: `src/routes/*.test.ts` (planned)
 - **Validation**: `../shared/src/validation/*.test.ts`
 
-Tests use Vitest with Node environment. Services are tested in isolation
-with mocked data-access layer.
+Tests use Vitest with Node environment. Services are tested in isolation with mocked data-access layer.

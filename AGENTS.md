@@ -136,15 +136,13 @@ need not repeat them.
 
 Run from the repository root. Each package also has package-specific scripts documented in its own `AGENTS.md`.
 
-| Command                | Scope | Description                        |
-| ---------------------- | ----- | ---------------------------------- |
-| `npm run lint`         | root  | ESLint across the monorepo         |
-| `npm run lint:fix`     | root  | ESLint with `--fix`                |
-| `npm run format`       | root  | Prettier write across the monorepo |
-| `npm run format:check` | root  | Prettier check (CI)                |
-| `npm run typecheck`    | all   | `tsc --noEmit` in every workspace  |
-| `npm run test`         | all   | Vitest in every workspace          |
-| `npm run build`        | all   | Build in every workspace           |
+| Command             | Scope | Description                       |
+| ------------------- | ----- | --------------------------------- |
+| `npm run lint`      | root  | ESLint across the monorepo        |
+| `npm run lint:fix`  | root  | ESLint with `--fix`               |
+| `npm run typecheck` | all   | `tsc --noEmit` in every workspace |
+| `npm run test`      | all   | Vitest in every workspace         |
+| `npm run build`     | all   | Build in every workspace          |
 
 ---
 

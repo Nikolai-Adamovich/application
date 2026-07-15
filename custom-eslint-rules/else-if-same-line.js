@@ -4,8 +4,7 @@ export default {
     fixable: 'whitespace',
     schema: [],
     messages: {
-      sameLine:
-        '`else if` must be on the same line. New line after `else` is not allowed.',
+      sameLine: '`else if` must be on the same line. New line after `else` is not allowed.',
     },
   },
 
@@ -20,10 +19,7 @@ export default {
           return;
         }
 
-        const elseToken = sourceCode.getTokenBefore(
-          alternate,
-          (token) => token.value === 'else',
-        );
+        const elseToken = sourceCode.getTokenBefore(alternate, (token) => token.value === 'else');
 
         if (!elseToken) {
           return;
@@ -34,10 +30,7 @@ export default {
             node: alternate,
             messageId: 'sameLine',
             fix(fixer) {
-              return fixer.replaceTextRange(
-                [elseToken.range[1], alternate.range[0]],
-                ' ',
-              );
+              return fixer.replaceTextRange([elseToken.range[1], alternate.range[0]], ' ');
             },
           });
         }

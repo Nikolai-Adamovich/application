@@ -9,10 +9,7 @@ import { ZodError } from 'zod';
 
 export function errorHandler(err: unknown, c: Context): Response {
   if (err instanceof ZodError) {
-    return c.json(
-      { error: 'validation_error', issues: err.issues },
-      400,
-    );
+    return c.json({ error: 'validation_error', issues: err.issues }, 400);
   }
 
   console.error('Unhandled error:', err);

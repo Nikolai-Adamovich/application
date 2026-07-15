@@ -13,8 +13,7 @@
     "e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . || true",
-    "lint:fix": "eslint . --fix || true",
-    "format": "prettier --write ."
+    "lint:fix": "eslint . --fix || true"
   },
   "dependencies": {
     "@angular/animations": "~22.0.0",

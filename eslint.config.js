@@ -5,13 +5,16 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import tseslint from 'typescript-eslint';
 import stylistic from '@stylistic/eslint-plugin';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import markdown from '@eslint/markdown';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import elseIfSameLine from './custom-eslint-rules/else-if-same-line.js';
 import ifParenSameLine from './custom-eslint-rules/if-paren-same-line.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const toFlatConfigArray = (config) => Array.isArray(config) ? config : [config];
+const toFlatConfigArray = (config) => (Array.isArray(config) ? config : [config]);
 
 export default [
   eslint.configs.recommended,
@@ -22,6 +25,7 @@ export default [
     files: ['**/*.{ts,js}'],
     plugins: {
       '@stylistic': stylistic,
+      prettier: eslintPluginPrettier,
       custom: {
         rules: {
           'else-if-same-line': elseIfSameLine,
@@ -36,6 +40,7 @@ export default [
       },
     },
     rules: {
+      'prettier/prettier': 'warn',
       '@stylistic/array-bracket-newline': ['error', 'consistent'],
       '@stylistic/array-bracket-spacing': 'error',
       '@stylistic/array-element-newline': ['error', 'consistent'],
@@ -101,12 +106,15 @@ export default [
       '@stylistic/semi-spacing': 'error',
       '@stylistic/semi-style': 'error',
       '@stylistic/space-before-blocks': 'error',
-      '@stylistic/space-before-function-paren': ['error', {
-        anonymous: 'always',
-        asyncArrow: 'always',
-        catch: 'always',
-        named: 'never',
-      }],
+      '@stylistic/space-before-function-paren': [
+        'error',
+        {
+          anonymous: 'always',
+          asyncArrow: 'always',
+          catch: 'always',
+          named: 'never',
+        },
+      ],
       '@stylistic/space-in-parens': 'error',
       '@stylistic/space-infix-ops': 'error',
       '@stylistic/space-unary-ops': ['error', { words: true, nonwords: false }],
@@ -135,12 +143,28 @@ export default [
       'custom/if-paren-same-line': 'error',
     },
   },
+  // Markdown: use @eslint/markdown parser, run only Prettier formatting check.
   {
-    ignores: [
-      '**/node_modules/**',
-      '**/.angular/**',
-      '**/.wrangler/**',
-      '**/coverage/**',
-    ],
+    files: ['**/*.md'],
+    plugins: {
+      markdown,
+      prettier: eslintPluginPrettier,
+    },
+    language: 'markdown/gfm',
+    rules: {
+      'prettier/prettier': ['warn', { parser: 'markdown' }],
+      // Disable markdown-specific rules from @eslint/markdown
+      'markdown/fenced-code-language': 'off',
+      'markdown/no-missing-label-refs': 'off',
+      // Core JS rules incompatible with the markdown parser
+      'no-irregular-whitespace': 'off',
+      'no-unused-vars': 'off',
+    },
   },
+  {
+    ignores: ['**/node_modules/**', '**/.angular/**', '**/.wrangler/**', '**/coverage/**'],
+  },
+  // Disables all @stylistic rules that conflict with Prettier.
+  // Must be last so Prettier is the formatting authority; ESLint keeps code-quality rules.
+  eslintConfigPrettier,
 ];

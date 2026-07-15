@@ -1,8 +1,9 @@
 // UI-specific ESLint overrides
 import baseConfig from '../eslint.config.js';
 import angular from 'angular-eslint';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
-const toFlatConfigArray = (config) => Array.isArray(config) ? config : [config];
+const toFlatConfigArray = (config) => (Array.isArray(config) ? config : [config]);
 
 /**
  * Returns a copy of each config object with the given `files` pattern applied.
@@ -32,11 +33,10 @@ export default [
       ],
       '@angular-eslint/directive-selector': ['error', { type: 'attribute', prefix: 'ui', style: 'camelCase' }],
     },
-    ignores: [
-      'dist/**',
-      '.angular/**',
-    ],
+    ignores: ['dist/**', '.angular/**'],
   },
   ...withFiles(angular.configs.templateRecommended, ['**/*.html']),
   ...withFiles(angular.configs.templateAccessibility, ['**/*.html']),
+  // Must be last — disables @stylistic / @angular-eslint rules that conflict with Prettier.
+  eslintConfigPrettier,
 ];

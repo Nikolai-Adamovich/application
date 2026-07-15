@@ -185,7 +185,6 @@ The project prefix is `app` (configured in [`angular.json`](angular.json)). All 
 | `npm run typecheck`  | `tsc --noEmit`                          |
 | `npm run lint`       | ESLint                                  |
 | `npm run lint:fix`   | ESLint with `--fix`                     |
-| `npm run format`     | Prettier write                          |
 
 ---
 

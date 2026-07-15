@@ -4,8 +4,7 @@ export default {
     fixable: 'whitespace',
     schema: [],
     messages: {
-      sameLine:
-        '`if (` must be on the same line. New line between `if` and `(` is not allowed.',
+      sameLine: '`if (` must be on the same line. New line between `if` and `(` is not allowed.',
     },
   },
 
@@ -17,18 +16,12 @@ export default {
         const ifToken = sourceCode.getFirstToken(node); // if
         const openParen = sourceCode.getTokenAfter(ifToken); // (
 
-        if (
-          openParen &&
-          ifToken.loc.end.line !== openParen.loc.start.line
-        ) {
+        if (openParen && ifToken.loc.end.line !== openParen.loc.start.line) {
           context.report({
             node,
             messageId: 'sameLine',
             fix(fixer) {
-              return fixer.replaceTextRange(
-                [ifToken.range[1], openParen.range[0]],
-                ' ',
-              );
+              return fixer.replaceTextRange([ifToken.range[1], openParen.range[0]], ' ');
             },
           });
         }
