@@ -1,14 +1,18 @@
 # Architecture
 
-> Single source of truth for the system architecture.
-> Any change here MUST be accompanied by an entry in [`decisions.md`](decisions.md).
+> Single source of truth for the system architecture. Any change here MUST be accompanied by an entry in
+> [`decisions.md`](decisions.md).
+>
+> Operational rules for agents (TypeScript standards, linting, testing, shared contracts) live in
+> [`AGENTS.md`](../AGENTS.md). Package-specific guides live in [`ui/AGENTS.md`](../ui/AGENTS.md) and
+> [`server/AGENTS.md`](../server/AGENTS.md).
 
 ---
 
 ## Overview
 
-A greenfield educational full-stack application built to learn modern development
-practices, AI-assisted workflows, and multi-agent software development.
+A greenfield educational full-stack application built to learn modern development practices, AI-assisted workflows, and
+multi-agent software development.
 
 The system is a monorepo with three packages that share contracts:
 
@@ -23,8 +27,8 @@ flowchart LR
 
 - **Latest stable Chrome only.** No legacy browser support required.
 - **Zoneless Angular** with Signals as the sole state management primitive.
-- **Edge-deployed backend** on Cloudflare Workers connecting to MongoDB Atlas
-  over TCP via `cloudflare:sockets` with `nodejs_compat`.
+- **Edge-deployed backend** on Cloudflare Workers connecting to MongoDB Atlas over TCP via `cloudflare:sockets` with
+  `nodejs_compat`.
 
 ---
 
@@ -38,8 +42,8 @@ application/
 └── server/        Hono backend (Cloudflare Workers)
 ```
 
-Managed with **npm workspaces**. The `shared` package is consumed by both `ui`
-and `server` as a local workspace dependency, eliminating duplicated DTOs.
+Managed with **npm workspaces**. The `shared` package is consumed by both `ui` and `server` as a local workspace
+dependency, eliminating duplicated DTOs.
 
 ---
 
@@ -54,7 +58,7 @@ and `server` as a local workspace dependency, eliminating duplicated DTOs.
 | State            | Angular Signals                         |
 | Forms            | Signal Forms                            |
 | Inputs/Queries   | Signal Inputs, Signal Queries           |
-| Data Fetching    | Resource API                            |
+| Data Fetching    | `httpResource`                          |
 | Template Syntax  | Control Flow (`@if`, `@for`, `@switch`) |
 | Lazy Loading     | Deferrable Views (`@defer`)             |
 | Change Detection | Zoneless                                |
@@ -66,6 +70,9 @@ and `server` as a local workspace dependency, eliminating duplicated DTOs.
 - Template-driven Forms
 - RxJS as state management (RxJS is fine for interop, not as a store)
 - Tailwind CSS
+
+> See [`ui/AGENTS.md`](../ui/AGENTS.md) for the full list (including `@HostBinding`/`@HostListener`, explicit
+> `standalone: true`, etc.).
 
 ### Deployment
 
@@ -94,19 +101,20 @@ Static build deployed to **Cloudflare Pages**.
 
 ### MongoDB on Workers
 
-The official MongoDB driver connects over TCP. Cloudflare Workers expose TCP
-via the `cloudflare:sockets` API and Node.js compatibility via the `nodejs_compat`
-compatibility flag. The driver is configured with a custom connection option
-that routes TCP through `cloudflare:sockets`.
+The official MongoDB driver connects over TCP. Cloudflare Workers expose TCP via the `cloudflare:sockets` API and
+Node.js compatibility via the `nodejs_compat` compatibility flag. The driver is configured with a custom connection
+option that routes TCP through `cloudflare:sockets`.
 
-> See ADR-0002 in [`decisions.md`](decisions.md) for the rationale and fallback
-> strategy.
+> See ADR-0002 in [`decisions.md`](decisions.md) for the rationale and fallback strategy.
 
 ### Forbidden in the backend
 
 - NestJS
 - Mongoose
 - Prisma
+- Express / Fastify (Hono is the only HTTP framework)
+
+> See [`server/AGENTS.md`](../server/AGENTS.md) for the full list.
 
 ---
 
@@ -118,8 +126,8 @@ Contains the contract layer reused by both frontend and backend:
 - **`validation/`** — Zod schemas (the single source of validation truth).
 - **`types/`** — TypeScript types inferred from Zod schemas (`z.infer`).
 
-Principle: define a schema once in `shared/validation`, infer types from it, and
-import on both sides. Never hand-write a DTO type that duplicates a Zod schema.
+Principle: define a schema once in `shared/validation`, infer types from it, and import on both sides. Never hand-write
+a DTO type that duplicates a Zod schema.
 
 ---
 
@@ -151,17 +159,15 @@ sequenceDiagram
 | Backend  | Vitest     | Unit tests for services, route handlers |
 | Shared   | Vitest     | Schema validation tests                 |
 
-All important business logic must be testable. Services are pure and
-dependency-injectable so they can be tested without a live database.
+All important business logic must be testable. Services are pure and dependency-injectable so they can be tested without
+a live database.
 
 ---
 
 ## Code Quality
 
-- **ESLint** + **Prettier** enforced on every commit via **Husky** + **lint-staged**.
-- **Commitlint** enforces **Conventional Commits**.
-- TypeScript **strict** mode is mandatory in all three packages.
-- `any` is forbidden.
+Code quality standards (TypeScript strict mode, no `any`, ESLint + Prettier, Conventional Commits, Vitest) are defined
+in [`AGENTS.md`](../AGENTS.md) under **Shared Standards** and are not repeated here.
 
 ---
 

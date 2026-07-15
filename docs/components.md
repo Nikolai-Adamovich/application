@@ -1,100 +1,98 @@
 # Components
 
-> High-level description of the system's logical components and their boundaries.
-> For the full architectural context, see [`architecture.md`](architecture.md).
+> Component boundaries, dependencies, and ownership. For the system-level architecture and data-flow diagrams, see
+> [`architecture.md`](architecture.md). For operational rules, see the [`AGENTS.md`](../AGENTS.md) files.
 
 ---
 
-## Package: `shared/`
+## Dependency Map
 
-The contract layer shared by `ui/` and `server/`.
+```mermaid
+flowchart TD
+    subgraph shared["shared/"]
+        SVal["validation/ (Zod schemas)"]
+        STyp["types/ (z.infer)"]
+        SCon["contracts/ (route defs)"]
+    end
+    subgraph ui["ui/"]
+        URes["resources/"]
+        USvc["services/"]
+        UComp["components/"]
+    end
+    subgraph server["server/"]
+        SRt["routes/"]
+        SSvc["services/"]
+        SData["data/"]
+        SMw["middleware/"]
+    end
 
-### `shared/validation/`
+    SVal --> STyp
+    SVal --> SCon
+    SVal -.->|"import"| URes
+    STyp -.->|"import"| USvc
+    SCon -.->|"import"| SRt
+    SVal -.->|"import"| SData
 
-Zod schemas defining every API request and response shape. This is the single
-source of truth for validation and types.
+    URes --> USvc
+    USvc --> UComp
+    SRt --> SSvc
+    SSvc --> SData
+    SMw -.-> SRt
+```
 
-### `shared/contracts/`
-
-API route definitions: method, path, request schema, response schema. Used by
-the backend to register routes and by the frontend to type API calls.
-
-### `shared/types/`
-
-TypeScript types inferred from Zod schemas via `z.infer`. Re-exported for
-ergonomic imports. No hand-written DTO types that duplicate a schema.
-
----
-
-## Package: `ui/`
-
-The Angular 22 frontend SPA.
-
-### Feature Components
-
-Standalone Angular components organized by feature. Each uses Signal Inputs,
-Signal Queries, and the new control flow syntax (`@if`, `@for`, `@switch`).
-
-### Services
-
-Injectable services holding Signals-based state and exposing methods to mutate
-it. Services are the state owners; components consume signals from services.
-
-### Resource Layer
-
-Angular Resource API wrappers around `fetch` calls to the backend. Typed
-against `shared/contracts`. Used with `@defer` for lazy-loaded views.
-
-### Forms
-
-Signal Forms for all user input. No template-driven or reactive-forms state.
-
-### Styling
-
-SCSS + PrimeNG theme. No Tailwind.
+Solid arrows = runtime calls. Dashed arrows = build-time type/schema imports.
 
 ---
 
-## Package: `server/`
+## `shared/` — Contract Layer
 
-The Hono backend on Cloudflare Workers.
+| Component     | Exposes                                   | Depends on              | Boundary                               |
+| ------------- | ----------------------------------------- | ----------------------- | -------------------------------------- |
+| `validation/` | Zod schemas                               | Zod only                | No runtime logic, no framework code    |
+| `types/`      | `z.infer` types                           | `validation/`           | Types only — never hand-written DTOs   |
+| `contracts/`  | Route definitions (method, path, schemas) | `validation/`, `types/` | API shape contracts, no implementation |
 
-### Routes
+> Rules: [`shared/AGENTS.md`](../shared/AGENTS.md)
 
-Thin Hono route handlers. Parse and validate input with shared Zod schemas,
-delegate to a service, and return a typed response. No business logic here.
+---
 
-### Services
+## `ui/` — Frontend SPA
 
-Service-oriented modules containing all business logic. Pure, injectable, and
-unit-testable without a live database. Services depend on the data-access layer,
-not on Hono.
+| Component     | Exposes                              | Depends on                          | Boundary                                    |
+| ------------- | ------------------------------------ | ----------------------------------- | ------------------------------------------- |
+| `components/` | Standalone components, templates     | `services/` (signals)               | No direct API calls; consume signals        |
+| `services/`   | Signal-based state, mutation methods | `@app/shared` types, `resources/`   | Owns state; no template logic               |
+| `resources/`  | `httpResource` wrappers              | `@app/shared` schemas, `HttpClient` | Validates responses with shared Zod schemas |
 
-### Data Access
+**Dependency direction:** `components → services → resources → shared contracts`
 
-A thin data-access layer wrapping the official MongoDB driver. Isolates the
-`cloudflare:sockets` + `nodejs_compat` connection details so the fallback
-strategy (ADR-0002) can swap implementations without touching services.
+> Rules: [`ui/AGENTS.md`](../ui/AGENTS.md)
 
-### Middleware
+---
 
-Hono middleware for cross-cutting concerns: error handling, request logging,
-CORS, and shared validation.
+## `server/` — Backend Worker
+
+| Component     | Exposes                          | Depends on                               | Boundary                            |
+| ------------- | -------------------------------- | ---------------------------------------- | ----------------------------------- |
+| `routes/`     | HTTP endpoints                   | Hono, `@app/shared` schemas, `services/` | Thin — validate, delegate, respond  |
+| `services/`   | Business logic methods           | `DataStore` interface                    | No Hono, no MongoDB driver          |
+| `data/`       | `DataStore` / `DataStoreFactory` | MongoDB driver, `cloudflare:sockets`     | Only place that knows about sockets |
+| `middleware/` | Error handler, CORS, logger      | Hono Context                             | Cross-cutting; no business logic    |
+
+**Dependency direction:** `routes → services → data (DataStore interface)`
+
+The `data/` layer is the **only** component that imports `mongodb` or `cloudflare:sockets`. This isolates the ADR-0002
+fallback (swap to Atlas Data API) to a single component.
+
+> Rules: [`server/AGENTS.md`](../server/AGENTS.md)
 
 ---
 
 ## Cross-Cutting
 
-### CI/CD
-
-GitHub Actions pipelines for lint, typecheck, unit tests, and build. Deploy to
-Cloudflare Pages (frontend) and Cloudflare Workers (backend) after successful CI.
-
-### Tooling
-
-ESLint, Prettier, Husky, lint-staged, Commitlint. Shared config at the repo
-root; package-specific overrides where necessary.
-
-### Testing
-
-Vitest for unit tests across all packages. Playwright for frontend E2E.
+| Concern    | Owner                                          | Notes                                                      |
+| ---------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| CI/CD      | GitHub Actions                                 | `lint → typecheck → test → build`; deploy on `main`        |
+| Linting    | Root [`eslint.config.js`](../eslint.config.js) | Package-specific overrides in each package                 |
+| Testing    | Vitest (all), Playwright (ui E2E)              | See [`AGENTS.md`](../AGENTS.md) Testing section            |
+| Env config | `server/env.ts`, `server/wrangler.toml`        | Secrets via `wrangler secret put`; vars in `wrangler.toml` |

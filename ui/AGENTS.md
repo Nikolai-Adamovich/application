@@ -5,14 +5,20 @@ maintainable, performant, and accessible code following the latest Angular and T
 
 This package contains the **Angular 22** frontend application built from scratch using the most modern features of the
 framework.  
-Read the root [`AGENTS.md`](../AGENTS.md) first.
+Read the root [`AGENTS.md`](../AGENTS.md) first — it defines cross-cutting standards (TypeScript strict mode, no `any`,
+ESLint/Prettier, Conventional Commits, Vitest, shared contracts) that this guide does not repeat.
 
 ## Stack
 
-- **Angular 22** (standalone components, zoneless)
-- **PrimeNG** + **SCSS** (using modern Sass @use syntax, no global @import)
+- **Angular 22** (standalone components, zoneless change detection)
+- **PrimeNG** + **SCSS** (using modern Sass `@use` syntax, no global `@import`)
 - **Signals** — sole state management solution
-- **Vitest** (unit tests) + **Playwright** (E2E tests)
+- **Vitest** (unit tests, `jsdom` environment) + **Playwright** (E2E tests)
+
+> Note: `primeng` is currently pinned to an RC (`~22.0.0-rc.2`). Treat its API as unstable until the stable release
+> lands.
+
+---
 
 ## Core Principles
 
@@ -22,7 +28,7 @@ Read the root [`AGENTS.md`](../AGENTS.md) first.
 - **Signals** for all state management
 - **Signal Inputs**, **Signal Queries**, and **Signal Forms** (`@angular/forms/signals`, using the `form()` function to
   build strongly-typed `FieldTree` models)
-- **httpResource** as the primary tool for data fetching
+- **`httpResource`** as the primary tool for data fetching
 - Native control flow: `@if`, `@for`, `@switch`
 - Deferrable views (`@defer`) for lazy loading
 
@@ -33,26 +39,67 @@ Read the root [`AGENTS.md`](../AGENTS.md) first.
 - Template-driven forms or Reactive Forms (FormGroup/FormControl)
 - RxJS as state management (RxJS is allowed only for complex stream composition/orchestration)
 - Tailwind CSS (use PrimeNG styling solutions and custom SCSS)
-- `any` type (always use precise interfaces or `unknown`)
 - `@HostBinding` and `@HostListener` decorators (use `host` property in `@Component` metadata)
 - Explicit `standalone: true` or `changeDetection: ChangeDetectionStrategy.OnPush` (omit them as they are defaults in
   Angular 22+)
 
+---
+
+## Project Layout
+
+```
+ui/src/
+├── main.ts              Application bootstrap (bootstrapApplication)
+├── index.html           HTML entry point
+├── styles.scss          Global styles + CSS custom properties
+├── test-setup.ts        Vitest setup (imports @angular/compiler)
+└── app/
+    ├── app.ts           Root standalone component
+    ├── app.html         Root template
+    ├── app.scss         Root styles
+    ├── app.config.ts    Application providers (router, error listeners)
+    ├── app.routes.ts    Route definitions
+    └── app.spec.ts      Root component test
+```
+
+### Naming conventions
+
+Angular 22 generates **suffix-less** component file names. Follow the CLI convention established by the root component
+([`app.ts`](src/app/app.ts)):
+
+| Element   | File name            | Example              |
+| --------- | -------------------- | -------------------- |
+| Component | `<name>.ts`          | `counter.ts`         |
+| Service   | `<name>.service.ts`  | `counter.service.ts` |
+| Resource  | `<name>.resource.ts` | `health.resource.ts` |
+| Test      | `<name>.spec.ts`     | `counter.spec.ts`    |
+
+> Do **not** use the legacy `*.component.ts` suffix for components.
+
+### Component selector prefix
+
+The project prefix is `app` (configured in [`angular.json`](angular.json)). All component selectors MUST use this prefix
+(e.g. `app-counter`, not `ui-counter`).
+
+---
+
 ## Conventions
 
-- Import shared contracts and types exclusively from `@app/shared` (or TypeScript path aliases like `@shared/...`)
-- Never redefine DTOs that already exist in `shared/`
-- Services own and manage state; components consume signals
-- Keep components thin — push logic into injectable services
-- Use strict TypeScript and strict template type checking
-- Relative paths for external templates and styles (relative to the component `.ts` file)
+- Import shared contracts and types **exclusively** from `@app/shared` — this is the only path alias configured in
+  [`tsconfig.json`](tsconfig.json). There is no `@shared/` alias.
+- Services own and manage state; components consume signals.
+- Keep components thin — push logic into injectable services.
+- Strict template type checking is enabled (`strictTemplates` in [`tsconfig.json`](tsconfig.json)).
+- Relative paths for external templates and styles (relative to the component `.ts` file).
 
-## TypeScript Best Practices
+### Application configuration
 
-- Leverage type inference wherever possible
-- Prefer interfaces or `unknown` over `any`
-- Enable strict type checking
-- Keep transformations pure and predictable
+- All providers live in [`app.config.ts`](src/app/app.config.ts) and are passed to `bootstrapApplication` in
+  [`main.ts`](src/main.ts). Do not register providers in `main.ts` directly.
+- Routing is configured via `provideRouter(routes)` in `app.config.ts`, not in `main.ts`.
+- Use functional providers (`provideRouter`, `provideBrowserGlobalErrorListeners`) rather than importing modules.
+
+---
 
 ## Angular Best Practices
 
@@ -62,8 +109,12 @@ Read the root [`AGENTS.md`](../AGENTS.md) first.
 - Use the new `@Service` decorator for registering singleton services
 - Implement lazy loading for feature routes
 - Use `NgOptimizedImage` for all static images (provide `width`/`height` or `fill` attribute)
-- **SSR Safety:** Do not access browser globals (`window`, `document`, `localStorage`) directly. Use `isPlatformBrowser`
-  or inject corresponding tokens
+- **Browser-global safety:** The app is client-side rendered (CSR) and deployed as a static build to Cloudflare Pages —
+  there is no SSR configured. Still, avoid accessing browser globals (`window`, `document`, `localStorage`) during
+  construction or module evaluation. Use `isPlatformBrowser` or inject the corresponding tokens so the code remains
+  SSR-ready if introduced later.
+
+---
 
 ## Data Fetching & Mutations
 
@@ -73,12 +124,17 @@ Read the root [`AGENTS.md`](../AGENTS.md) first.
 - Use **`rxResource`** only when you need to integrate with existing complex RxJS pipelines (e.g., custom debouncing,
   interval polling)
 - Keep data fetching and mutation logic inside services
+- Validate API responses with shared Zod schemas from `@app/shared` before consuming them
+
+---
 
 ## Components
 
 - Small, focused on a single responsibility
 - Use `[class]` and `[style]` bindings instead of `ngClass` / `ngStyle`
 - Manage local UI-state with signals
+
+---
 
 ## State Management
 
@@ -87,6 +143,8 @@ Read the root [`AGENTS.md`](../AGENTS.md) first.
 - Prefer `set()` and `update()` over direct state mutation
 - Services act as the single source of truth
 
+---
+
 ## Templates
 
 - Keep templates simple, declarative, and readable
@@ -94,18 +152,67 @@ Read the root [`AGENTS.md`](../AGENTS.md) first.
 - Use native control flow syntax (`@if`, `@for` with track expression)
 - Do not rely on global objects like `new Date()` directly in templates (wrap in computed signals or pipes)
 
+---
+
 ## Services
 
 - Follow single responsibility principle
 - Provide services at root level using `@Service` decorator
 - Handle side effects within services using `effect()` only when syncing state with external APIs
 
+---
+
+## Styling
+
+- Global styles live in [`src/styles.scss`](src/styles.scss).
+- Component styles are inline (`styles: [...]`) or external (`styleUrl`).
+- Use modern Sass `@use` syntax — never global `@import`.
+- PrimeNG theme is configured at the build level; import only the modules you need per component (e.g.
+  `import { ButtonModule } from 'primeng/button'`).
+
+---
+
+## Commands
+
+| Command              | Description                             |
+| -------------------- | --------------------------------------- |
+| `npm start`          | `ng serve` — local dev server           |
+| `npm run build`      | `ng build` — production build           |
+| `npm run watch`      | `ng build --watch` (development config) |
+| `npm run test`       | `vitest run` — unit tests once          |
+| `npm run test:watch` | `vitest` — unit tests in watch mode     |
+| `npm run e2e`        | `playwright test` — E2E tests           |
+| `npm run typecheck`  | `tsc --noEmit`                          |
+| `npm run lint`       | ESLint                                  |
+| `npm run lint:fix`   | ESLint with `--fix`                     |
+| `npm run format`     | Prettier write                          |
+
+---
+
 ## Testing
 
 - Unit test components and services with **Vitest**
+- Test files use the `.spec.ts` suffix and live next to the source file
+- Use `TestBed` from `@angular/core/testing` for component tests requiring dependency injection
 - Test critical user flows and accessibility with **Playwright** (E2E)
+
+---
 
 ## Accessibility
 
 - Must pass all **AXE** checks
 - Must meet **WCAG 2.1 AA** standards (focus management, color contrast, correct ARIA attributes)
+
+---
+
+## Adding a new feature
+
+1. **Contract** — define the Zod schema and inferred type in `shared/`.
+2. **Service** — create `*.service.ts` with the `@Service` decorator, owning the feature's state as signals.
+3. **Resource** — if the feature fetches data, create `*.resource.ts` using `httpResource` and validate responses with
+   the shared schema.
+4. **Component** — create the standalone component(s), consuming signals from the service. Keep it thin.
+5. **Route** — register the route in `app.routes.ts` (lazy-load with `loadComponent` for feature routes).
+6. **Tests** — add `*.spec.ts` for the component and service.
+7. **Docs** — architectural changes require Architect approval (see root
+   [`AGENTS.md`](../AGENTS.md#development-workflow)).
