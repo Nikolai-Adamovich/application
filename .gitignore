@@ -9,7 +9,8 @@ node_modules/
 # Compiled output
 /dist
 /tmp
-/out-tsc
+out-tsc/
+*.tsbuildinfo
 /bazel-out
 
 # Node

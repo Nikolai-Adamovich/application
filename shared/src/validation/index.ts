@@ -7,3 +7,4 @@
  * Note: inferred types are re-exported from `../types`, not here, to avoid
  * duplicate re-exports in the package barrel.
  */
+export {};
