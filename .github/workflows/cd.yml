@@ -37,12 +37,10 @@ jobs:
         run: npm run build --workspace @app/ui
 
       - name: Deploy frontend to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: application-ui
-          directory: ui/dist
+        run: npx wrangler pages deploy ui/dist/ui --project-name=application-ui
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy backend to Cloudflare Workers
         working-directory: server
