@@ -162,7 +162,14 @@ export default [
     },
   },
   {
-    ignores: ['**/node_modules/**', '**/.angular/**', '**/.wrangler/**', '**/coverage/**'],
+    ignores: [
+      '**/node_modules/**',
+      '**/.angular/**',
+      '**/dist/**',
+      '**/out-tsc/**',
+      '**/.wrangler/**',
+      '**/coverage/**',
+    ],
   },
   // Disables all @stylistic rules that conflict with Prettier.
   // Must be last so Prettier is the formatting authority; ESLint keeps code-quality rules.
