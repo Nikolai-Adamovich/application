@@ -36,8 +36,14 @@ jobs:
       - name: Build frontend
         run: npm run build --workspace @app/ui
 
+      - name: Create Pages project (first deploy only)
+        run: npx wrangler pages project create application-ui --production-branch=main || true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy frontend to Cloudflare Pages
-        run: npx wrangler pages deploy ui/dist/ui --project-name=application-ui
+        run: npx wrangler pages deploy ui/dist/ui --project-name=application-ui --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
