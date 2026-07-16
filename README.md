@@ -27,7 +27,7 @@ delivering work efficiently across teams and projects.
 ## 📦 Packages
 
 - [`shared/`](shared/): Shared contracts, Zod schemas, and TypeScript types.
-- [`ui/`](ui/): Angular 22 frontend.
+- [`ui/`](ui/): Angular frontend.
 - [`server/`](server/): Hono backend on Cloudflare Workers.
 
 ## 🚀 Getting Started
@@ -43,6 +43,74 @@ delivering work efficiently across teams and projects.
     - Lint the monorepo: `npm run lint`
 
 See [`docs/`](docs/) for the full architectural documentation and development workflows.
+
+## 🛠️ Tech Stack
+
+### Frontend — [`ui/`](ui/)
+
+| Concern         | Technology                                                    |
+| --------------- | ------------------------------------------------------------- |
+| Framework       | Angular (standalone components, zoneless)                     |
+| Language        | TypeScript (strict mode)                                      |
+| UI Library      | PrimeNG                                                       |
+| Styling         | SCSS (modern `@use` syntax)                                   |
+| State           | Angular Signals (signal inputs, signal queries, signal forms) |
+| Data Fetching   | `httpResource`                                                |
+| Template Syntax | Native control flow (`@if`, `@for`, `@switch`, `@defer`)      |
+| Unit Testing    | Vitest (`jsdom`)                                              |
+| E2E Testing     | Playwright                                                    |
+| Linting         | ESLint + angular-eslint + Prettier                            |
+| Deployment      | Cloudflare Pages (static build)                               |
+
+### Backend — [`server/`](server/)
+
+| Concern       | Technology                                     |
+| ------------- | ---------------------------------------------- |
+| Runtime       | Cloudflare Workers (V8 isolates, edge runtime) |
+| Framework     | Hono                                           |
+| Language      | TypeScript (strict mode)                       |
+| Database      | MongoDB Atlas                                  |
+| Driver        | Official MongoDB Node Driver                   |
+| Validation    | Zod (schemas shared from `@app/shared`)        |
+| TCP Transport | `cloudflare:sockets` + `nodejs_compat`         |
+| Unit Testing  | Vitest (Node environment)                      |
+| Linting       | ESLint + Prettier                              |
+| Deployment    | Cloudflare Workers (via Wrangler)              |
+
+### Shared — [`shared/`](shared/)
+
+| Concern   | Technology                                     |
+| --------- | ---------------------------------------------- |
+| Schemas   | Zod (single source of truth)                   |
+| Types     | `z.infer` (derived from Zod schemas)           |
+| Contracts | API route definitions, request/response shapes |
+
+### Infrastructure & Tooling
+
+| Concern        | Technology                                                                     |
+| -------------- | ------------------------------------------------------------------------------ |
+| Monorepo       | npm workspaces (`shared`, `ui`, `server`)                                      |
+| Language       | TypeScript (strict mode, `verbatimModuleSyntax`, `exactOptionalPropertyTypes`) |
+| Source Control | Git + GitHub                                                                   |
+| CI             | GitHub Actions (`lint → typecheck → test → build`)                             |
+| CD             | GitHub Actions (auto-deploy `main` to Cloudflare Pages + Workers)              |
+| Code Quality   | ESLint + Prettier + custom ESLint rules                                        |
+| Git Hooks      | Husky + lint-staged (pre-commit) + Commitlint (commit-msg)                     |
+| Commits        | Conventional Commits                                                           |
+| Testing        | Vitest (all packages) + Playwright (UI E2E)                                    |
+| Node.js        | `>=24.18.0`                                                                    |
+
+### Architecture & Methodology
+
+- **Multi-tenant SaaS** — isolated workspaces per customer with RBAC
+- **Monorepo** — single repo, shared contracts, no DTO duplication
+- **Edge-first backend** — Cloudflare Workers with MongoDB over TCP via `cloudflare:sockets`
+- **Signal-based state** — Angular Signals as the sole state management primitive
+- **Schema-first contracts** — Zod schemas in `shared/` are the single source of truth; types inferred via `z.infer`
+- **Thin edges, rich services** — route handlers and component templates are thin; business logic lives in injectable
+  services
+- **Service-oriented layering** — `routes → services → data` (backend), `components → services → resources` (frontend)
+- **Strict TypeScript everywhere** — `strict`, `noImplicitAny`, `strictNullChecks`, no `any`
 
 ## ⚙️ Recommended VS Code Settings
 

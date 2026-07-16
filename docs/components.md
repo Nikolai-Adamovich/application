@@ -60,7 +60,7 @@ Solid arrows = runtime calls. Dashed arrows = build-time type/schema imports.
 
 | Component     | Exposes                              | Depends on                          | Boundary                                    |
 | ------------- | ------------------------------------ | ----------------------------------- | ------------------------------------------- |
-| `components/` | Standalone components, templates     | `services/` (signals)               | No direct API calls; consume signals        |
+| `components/` | Standalone components (`<name>.ts`)  | `services/` (signals)               | No direct API calls; consume signals        |
 | `services/`   | Signal-based state, mutation methods | `@app/shared` types, `resources/`   | Owns state; no template logic               |
 | `resources/`  | `httpResource` wrappers              | `@app/shared` schemas, `HttpClient` | Validates responses with shared Zod schemas |
 

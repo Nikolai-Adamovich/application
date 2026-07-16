@@ -78,8 +78,8 @@ Angular 22 generates **suffix-less** component file names. Follow the CLI conven
 
 ### Component selector prefix
 
-The project prefix is `app` (configured in [`angular.json`](angular.json)). All component selectors MUST use this prefix
-(e.g. `app-counter`, not `ui-counter`).
+The project prefix is `ui` (enforced by the [`component-selector`](eslint.config.js) ESLint rule and configured in
+[`angular.json`](angular.json)). All component selectors MUST use this prefix (e.g. `ui-counter`, not `app-counter`).
 
 ---
 

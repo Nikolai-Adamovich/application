@@ -1,43 +1,51 @@
 # UI Architecture
 
 Frontend-specific design notes. For the full monorepo architecture, see
-[`docs/architecture.md`](../../docs/architecture.md).
+[`docs/architecture.md`](../../docs/architecture.md). For operational rules, see [`ui/AGENTS.md`](../AGENTS.md).
 
 ## Feature Folder Structure and Naming Conventions
 
 ```
 ui/src/
-├── main.ts              Application bootstrap
+├── main.ts              Application bootstrap (bootstrapApplication)
 ├── index.html           HTML entry point
-├── styles.scss          Global styles
-├── test-setup.ts        Vitest test setup
+├── styles.scss          Global styles + CSS custom properties
+├── test-setup.ts        Vitest setup (imports @angular/compiler)
 └── app/
-    ├── app.component.ts Root standalone component
-    ├── app.component.test.ts
-    └── data/
-        └── (data resources) Data fetching resources
+    ├── app.ts           Root standalone component
+    ├── app.html         Root template
+    ├── app.scss         Root styles
+    ├── app.config.ts    Application providers (router, error listeners)
+    ├── app.routes.ts    Route definitions
+    └── app.spec.ts      Root component test
 ```
 
-**Naming conventions:**
+**Naming conventions** (Angular 22 suffix-less, matching [`ui/AGENTS.md`](../AGENTS.md#naming-conventions)):
 
-- Standalone components: `*.component.ts`
-- Services: `*.service.ts`
-- Resources: `*.resource.ts`
-- Tests: `*.test.ts`
+| Element   | File name            | Example              |
+| --------- | -------------------- | -------------------- |
+| Component | `<name>.ts`          | `counter.ts`         |
+| Service   | `<name>.service.ts`  | `counter.service.ts` |
+| Resource  | `<name>.resource.ts` | `health.resource.ts` |
+| Test      | `<name>.spec.ts`     | `counter.spec.ts`    |
+
+> Do **not** use the legacy `*.component.ts` suffix for components.
 
 ## Signal-Based State Management Patterns
 
 **State ownership:** Services own state; components consume signals from services.
 
-**Pattern:**
+**Pattern** (using the `@Service` decorator):
 
 ```typescript
-@Injectable({ providedIn: 'root' })
+import { Service } from '@angular/core';
+
+@Service()
 export class CounterService {
-  private _count = signal(0);
+  private readonly _count = signal(0);
   readonly count = this._count.asReadonly();
 
-  increment() {
+  increment(): void {
     this._count.update((n) => n + 1);
   }
 }
@@ -46,27 +54,32 @@ export class CounterService {
 **Component consumption:**
 
 ```typescript
+import { Component, inject } from '@angular/core';
+
 @Component({
+  selector: 'ui-counter',
   template: `Count: {{ count() }}`,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CounterComponent {
+export class Counter {
   readonly count = inject(CounterService).count;
 }
 ```
 
-## Resource API Usage and Error Handling
+> Note: `standalone: true` and `changeDetection: ChangeDetectionStrategy.OnPush` are omitted — they are defaults in
+> Angular 22+.
 
-The Resource API provides declarative data fetching with built-in loading/error states:
+## Data Fetching with `httpResource`
+
+Use [`httpResource`](../AGENTS.md#data-fetching--mutations) as the primary data-fetching tool. Validate responses with
+shared Zod schemas from `@app/shared`:
 
 ```typescript
+import { httpResource } from '@angular/common/http';
+import { healthSchema } from '@app/shared';
+
 export class HealthResource {
-  readonly health = resource<Health>({
-    loader: async () => {
-      const res = await fetch('/health');
-      if (!res.ok) throw new Error('Failed');
-      return healthSchema.parse(await res.json());
-    },
+  readonly health = httpResource(() => '/api/health', {
+    parse: (raw) => healthSchema.parse(raw),
   });
 }
 ```
@@ -74,8 +87,8 @@ export class HealthResource {
 **Template usage:**
 
 ```html
-@if (health.value(); as health) {
-<p>Status: {{ health.status }}</p>
+@if (health.value(); as data) {
+<p>Status: {{ data.status }}</p>
 } @else if (health.isLoading()) {
 <p>Loading…</p>
 } @else if (health.error(); as error) {
@@ -85,12 +98,13 @@ export class HealthResource {
 
 ## PrimeNG Theming and SCSS Organization
 
-**Theme:** Lara Light Blue (PrimeNG's default light theme)
+**Theme:** Configured at the build level in [`angular.json`](../angular.json).
 
 **SCSS structure:**
 
-- `src/styles.scss` — Global styles, CSS custom properties
-- Component styles — Inline in `@Component` decorators
+- [`src/styles.scss`](../src/styles.scss) — Global styles, CSS custom properties
+- Component styles — inline (`styles: [...]`) or external (`styleUrl`)
+- Use modern Sass `@use` syntax — never global `@import`
 
 **PrimeNG modules:** Import only needed modules in components:
 
@@ -103,23 +117,34 @@ import { ButtonModule } from 'primeng/button';
 })
 ```
 
-## Routing and Lazy-Loading Strategy with `@defer`
+## Routing and Lazy-Loading Strategy
 
-**Routing:** Standalone components with `provideRouter` in `main.ts`
+**Routing:** Configured via `provideRouter(routes)` in [`app.config.ts`](../src/app/app.config.ts), not in `main.ts`.
 
-**Lazy loading:** Use `@defer` for non-critical content:
+**Lazy loading:** Use `loadComponent` for feature routes in [`app.routes.ts`](../src/app/app.routes.ts):
+
+```typescript
+export const routes: Routes = [
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
+  },
+];
+```
+
+Use `@defer` for non-critical content within templates:
 
 ```html
-@defer (viewport) {
-<app-heavy-component />
+@defer (on viewport) {
+<ui-heavy-component />
 }
 ```
 
 ## Vitest Test Inventory
 
-- **Components:** `src/app/*.test.ts`
-- **Resources:** `src/app/data/*.test.ts`
-- **Services:** `src/app/services/*.test.ts` (planned)
+- **Components:** `src/app/*.spec.ts`
+- **Resources:** `src/app/data/*.spec.ts` (planned)
+- **Services:** `src/app/services/*.spec.ts` (planned)
 
 Tests use Vitest with `jsdom` environment. Use `TestBed` from `@angular/core/testing` for component tests requiring
-dependency injection.
+dependency injection. See [`ui/AGENTS.md`](../AGENTS.md#testing) for the full testing guide.

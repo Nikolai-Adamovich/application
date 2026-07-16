@@ -152,12 +152,12 @@ sequenceDiagram
 
 ## Testing Strategy
 
-| Layer    | Tool       | Scope                                   |
-| -------- | ---------- | --------------------------------------- |
-| Frontend | Vitest     | Unit tests for components, services     |
-| Frontend | Playwright | End-to-end browser tests                |
-| Backend  | Vitest     | Unit tests for services, route handlers |
-| Shared   | Vitest     | Schema validation tests                 |
+| Layer    | Tool                 | Scope                                   |
+| -------- | -------------------- | --------------------------------------- |
+| Frontend | Vitest (`*.spec.ts`) | Unit tests for components, services     |
+| Frontend | Playwright           | End-to-end browser tests                |
+| Backend  | Vitest (`*.test.ts`) | Unit tests for services, route handlers |
+| Shared   | Vitest (`*.test.ts`) | Schema validation tests                 |
 
 All important business logic must be testable. Services are pure and dependency-injectable so they can be tested without
 a live database.
