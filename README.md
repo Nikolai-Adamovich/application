@@ -1,5 +1,7 @@
 # Task Board
 
+> 🌐 **Live application:** [**https://app-board.pages.dev/**](https://app-board.pages.dev/)
+
 **Task Board** is a cloud-based platform for project management, task tracking, and team collaboration.
 
 The platform enables organizations to create dedicated workspaces, manage multiple projects, plan and prioritize work,
@@ -22,13 +24,13 @@ management, time tracking, integrations, and other business capabilities.
 The goal of **Task Board** is to provide organizations with a single, scalable workspace for planning, coordinating, and
 delivering work efficiently across teams and projects.
 
-## Packages
+## 📦 Packages
 
 - [`shared/`](shared/): Shared contracts, Zod schemas, and TypeScript types.
 - [`ui/`](ui/): Angular 22 frontend.
 - [`server/`](server/): Hono backend on Cloudflare Workers.
 
-## Getting Started
+## 🚀 Getting Started
 
 1.  **Prerequisites:** Node.js v24+ and npm.
 2.  **Install dependencies:**
@@ -42,7 +44,7 @@ delivering work efficiently across teams and projects.
 
 See [`docs/`](docs/) for the full architectural documentation and development workflows.
 
-## Recommended VS Code Settings
+## ⚙️ Recommended VS Code Settings
 
 Create `.vscode/settings.json` in the project root with the following content. This file is gitignored — each developer
 maintains their own copy.
@@ -63,7 +65,7 @@ maintains their own copy.
 }
 ```
 
-**How it works:**
+**🔧 How it works:**
 
 - **TS/JS files** — Prettier formats on save, then ESLint auto-fix applies @stylistic and code-quality rules (ESLint has
   the last word = priority).
@@ -71,7 +73,7 @@ maintains their own copy.
 - **`npm run lint`** — checks both ESLint rules and Prettier formatting for TS/JS/MD files. This is the single command
   used in CI.
 
-**Required VS Code extensions:**
+**🧩 Required VS Code extensions:**
 
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
