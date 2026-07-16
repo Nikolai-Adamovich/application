@@ -8,6 +8,9 @@ on:
 #   CLOUDFLARE_API_TOKEN  — Cloudflare API token with Pages + Workers permissions
 #   CLOUDFLARE_ACCOUNT_ID — Cloudflare account ID
 #   MONGODB_URI           — MongoDB Atlas connection string (Workers secret)
+#
+# Requires repository variables:
+#   PROJECT_NAME — Cloudflare Pages project name (PROJECT_NAME.pages.dev)
 
 concurrency:
   group: cd-${{ github.ref }}
@@ -38,17 +41,17 @@ jobs:
 
       - name: Create Pages project (first deploy only)
         run: |
-          if ! npx wrangler pages project get board > /dev/null 2>&1; then
-            npx wrangler pages project create board --production-branch=main
+          if ! npx wrangler pages project get ${{ vars.PROJECT_NAME }} > /dev/null 2>&1; then
+            npx wrangler pages project create ${{ vars.PROJECT_NAME }} --production-branch=main
           else
-            echo "Pages project 'board' already exists, skipping creation."
+            echo "Pages project '${{ vars.PROJECT_NAME }}' already exists, skipping creation."
           fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy frontend to Cloudflare Pages
-        run: npx wrangler pages deploy ui/dist/ui/browser --project-name=board --branch=main
+        run: npx wrangler pages deploy ui/dist/ui/browser --project-name=${{ vars.PROJECT_NAME }} --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
