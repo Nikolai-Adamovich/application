@@ -23,7 +23,7 @@
     "@cloudflare/workers-types": "^4.20240909.0",
     "typescript": "^6.0.0",
     "vitest": "^4.0.0",
-    "wrangler": "^3.78.0"
+    "wrangler": "^4.111.0"
   },
   "engines": {
     "node": ">=24.18.0"
