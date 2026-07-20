@@ -17,7 +17,13 @@
       "@app/shared": ["../shared/src/index.ts"],
       "@app/shared/*": ["../shared/src/*"],
       "@spartan-ng/helm/button": ["./libs/ui/button/src/index.ts"],
-      "@spartan-ng/helm/utils": ["./libs/ui/utils/src/index.ts"]
+      "@spartan-ng/helm/utils": ["./libs/ui/utils/src/index.ts"],
+      "@spartan-ng/helm/tabs": ["./libs/ui/tabs/src/index.ts"],
+      "@spartan-ng/helm/input": ["./libs/ui/input/src/index.ts"],
+      "@spartan-ng/helm/label": ["./libs/ui/label/src/index.ts"],
+      "@spartan-ng/helm/field": ["./libs/ui/field/src/index.ts"],
+      "@spartan-ng/helm/separator": ["./libs/ui/separator/src/index.ts"],
+      "@spartan-ng/helm/card": ["./libs/ui/card/src/index.ts"]
     },
     "skipLibCheck": true,
     "target": "ES2022",

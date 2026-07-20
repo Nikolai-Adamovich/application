@@ -4,9 +4,9 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 
 @Component({
-  selector: 'ui-home',
-  templateUrl: './home.html',
-  styleUrl: './home.scss',
+  selector: 'ui-about',
+  templateUrl: './about.html',
+  styleUrl: './about.scss',
   imports: [HlmButtonImports, HlmCardImports, RouterLink],
 })
-export default class Home {}
+export default class About {}

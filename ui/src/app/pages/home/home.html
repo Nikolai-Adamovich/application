@@ -1,3 +1,60 @@
-<section>
-  <button hlmBtn variant="outline">Btn name</button>
+<section class="mx-auto max-w-4xl px-4 py-16">
+  <!-- Hero -->
+  <div class="mb-16 text-center">
+    <h1 class="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">Welcome to Application</h1>
+    <p class="text-muted-foreground mx-auto mb-8 max-w-2xl text-lg">
+      A modern platform designed to streamline your workflow, boost productivity, and help your team collaborate more
+      effectively.
+    </p>
+    <div class="flex items-center justify-center gap-3">
+      <a hlmBtn routerLink="/authentication">Get Started</a>
+      <a hlmBtn variant="outline" routerLink="/about">Learn More</a>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle>Fast & Reliable</h2>
+      </div>
+      <div hlmCardContent>
+        <p class="text-muted-foreground text-sm">
+          Built on a modern stack with Cloudflare Workers for edge-deployed performance and MongoDB Atlas for dependable
+          data storage.
+        </p>
+      </div>
+    </div>
+
+    <div hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle>Secure by Default</h2>
+      </div>
+      <div hlmCardContent>
+        <p class="text-muted-foreground text-sm">
+          Industry-standard authentication, input validation with Zod schemas, and strict TypeScript checks keep your
+          data safe.
+        </p>
+      </div>
+    </div>
+
+    <div hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle>Developer Experience</h2>
+      </div>
+      <div hlmCardContent>
+        <p class="text-muted-foreground text-sm">
+          Clean architecture, shared contracts between frontend and backend, and a fully typed codebase make development
+          a breeze.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="mt-16 text-center">
+    <h2 class="mb-3 text-2xl font-semibold tracking-tight">Ready to get started?</h2>
+    <p class="text-muted-foreground mb-6">Create a free account and explore everything the platform has to offer.</p>
+    <a hlmBtn size="lg" routerLink="/authentication">Create Account</a>
+  </div>
 </section>

@@ -1,0 +1,113 @@
+<section class="mx-auto max-w-lg px-4 py-12">
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h2 hlmCardTitle>Welcome</h2>
+      <p hlmCardDescription>Sign in to your account or create a new one</p>
+    </div>
+    <div hlmCardContent>
+      <div hlmTabs [tab]="activeTab()">
+        <div hlmTabsList class="mb-6 w-full">
+          <button hlmTabsTrigger="login" class="flex-1" (click)="activeTab.set('login')">Login</button>
+          <button hlmTabsTrigger="register" class="flex-1" (click)="activeTab.set('register')">Register</button>
+        </div>
+
+        <!-- Login tab -->
+        <div hlmTabsContent="login">
+          <form [formRoot]="loginForm" id="form-login">
+            <hlm-field-group>
+              <hlm-field>
+                <label hlmFieldLabel for="login-email">Email</label>
+                <input
+                  hlmInput
+                  id="login-email"
+                  type="email"
+                  placeholder="name&#64;example.com"
+                  [formField]="loginForm.email"
+                />
+                @for (error of loginForm.email().errors(); track error.kind) {
+                  <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+                }
+              </hlm-field>
+              <hlm-field>
+                <label hlmFieldLabel for="login-password">Password</label>
+                <input
+                  hlmInput
+                  id="login-password"
+                  type="password"
+                  placeholder="••••••••"
+                  [formField]="loginForm.password"
+                />
+                @for (error of loginForm.password().errors(); track error.kind) {
+                  <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+                }
+              </hlm-field>
+            </hlm-field-group>
+          </form>
+        </div>
+
+        <!-- Register tab -->
+        <div hlmTabsContent="register">
+          <form [formRoot]="registerForm" id="form-register">
+            <hlm-field-group>
+              <hlm-field>
+                <label hlmFieldLabel for="register-name">Name</label>
+                <input hlmInput id="register-name" type="text" placeholder="John Doe" [formField]="registerForm.name" />
+                @for (error of registerForm.name().errors(); track error.kind) {
+                  <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+                }
+              </hlm-field>
+              <hlm-field>
+                <label hlmFieldLabel for="register-email">Email</label>
+                <input
+                  hlmInput
+                  id="register-email"
+                  type="email"
+                  placeholder="name&#64;example.com"
+                  [formField]="registerForm.email"
+                />
+                @for (error of registerForm.email().errors(); track error.kind) {
+                  <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+                }
+              </hlm-field>
+              <hlm-field>
+                <label hlmFieldLabel for="register-password">Password</label>
+                <input
+                  hlmInput
+                  id="register-password"
+                  type="password"
+                  placeholder="••••••••"
+                  [formField]="registerForm.password"
+                />
+                @for (error of registerForm.password().errors(); track error.kind) {
+                  <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+                }
+              </hlm-field>
+              <hlm-field>
+                <label hlmFieldLabel for="register-confirm-password">Confirm Password</label>
+                <input
+                  hlmInput
+                  id="register-confirm-password"
+                  type="password"
+                  placeholder="••••••••"
+                  [formField]="registerForm.confirmPassword"
+                />
+                @for (error of registerForm.confirmPassword().errors(); track error.kind) {
+                  <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+                }
+              </hlm-field>
+            </hlm-field-group>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div hlmCardFooter>
+      <hlm-field orientation="horizontal">
+        @if (activeTab() === 'login') {
+          <button hlmBtn type="submit" form="form-login" class="w-full">Sign In</button>
+        } @else {
+          <button hlmBtn type="submit" form="form-register" class="w-full">Create Account</button>
+        }
+      </hlm-field>
+    </div>
+  </div>
+</section>
