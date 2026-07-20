@@ -6,6 +6,6 @@
     "types": [],
     "noEmit": false
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "libs/ui/**/src/**/*.ts"],
   "exclude": ["**/*.test.ts", "**/*.spec.ts", "dist", ".angular"]
 }

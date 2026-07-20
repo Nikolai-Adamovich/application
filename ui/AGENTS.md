@@ -11,12 +11,9 @@ ESLint/Prettier, Conventional Commits, Vitest, shared contracts) that this guide
 ## Stack
 
 - **Angular 22** (standalone components, zoneless change detection)
-- **PrimeNG** + **SCSS** (using modern Sass `@use` syntax, no global `@import`)
+- **Spartan UI** + **Tailwind CSS** + **SCSS** (using modern Sass `@use` syntax, no global `@import`)
 - **Signals** — sole state management solution
 - **Vitest** (unit tests, `jsdom` environment) + **Playwright** (E2E tests)
-
-> Note: `primeng` is currently pinned to an RC (`~22.0.0-rc.2`). Treat its API as unstable until the stable release
-> lands.
 
 ---
 
@@ -38,7 +35,6 @@ ESLint/Prettier, Conventional Commits, Vitest, shared contracts) that this guide
 - NgRx (use Signal Store or lightweight Signal Services)
 - Template-driven forms or Reactive Forms (FormGroup/FormControl)
 - RxJS as state management (RxJS is allowed only for complex stream composition/orchestration)
-- Tailwind CSS (use PrimeNG styling solutions and custom SCSS)
 - `@HostBinding` and `@HostListener` decorators (use `host` property in `@Component` metadata)
 - Explicit `standalone: true` or `changeDetection: ChangeDetectionStrategy.OnPush` (omit them as they are defaults in
   Angular 22+)
@@ -51,7 +47,7 @@ ESLint/Prettier, Conventional Commits, Vitest, shared contracts) that this guide
 ui/src/
 ├── main.ts              Application bootstrap (bootstrapApplication)
 ├── index.html           HTML entry point
-├── styles.scss          Global styles + CSS custom properties
+├── styles.css           Global styles + CSS custom properties
 ├── test-setup.ts        Vitest setup (imports @angular/compiler)
 └── app/
     ├── app.ts           Root standalone component
@@ -164,11 +160,14 @@ The project prefix is `ui` (enforced by the [`component-selector`](eslint.config
 
 ## Styling
 
-- Global styles live in [`src/styles.scss`](src/styles.scss).
+- Global styles live in [`src/styles.css`](src/styles.css).
 - Component styles are inline (`styles: [...]`) or external (`styleUrl`).
 - Use modern Sass `@use` syntax — never global `@import`.
-- PrimeNG theme is configured at the build level; import only the modules you need per component (e.g.
-  `import { ButtonModule } from 'primeng/button'`).
+- **Tailwind CSS v4** is the primary styling approach. Use Tailwind utility classes in templates. SCSS is used for
+  complex custom styles that cannot be expressed with utilities.
+- **Spartan UI** provides accessible, unstyled component primitives (helm components). Import only the modules you need
+  per component (e.g. `import { HlmButtonImports } from '@spartan-ng/helm/button'`). See
+  [`docs/architecture.md`](docs/architecture.md#adding-a-spartan-ui-component) for the full guide on adding components.
 
 ---
 

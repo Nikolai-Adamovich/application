@@ -15,7 +15,9 @@
     "noPropertyAccessFromIndexSignature": true,
     "paths": {
       "@app/shared": ["../shared/src/index.ts"],
-      "@app/shared/*": ["../shared/src/*"]
+      "@app/shared/*": ["../shared/src/*"],
+      "@spartan-ng/helm/button": ["./libs/ui/button/src/index.ts"],
+      "@spartan-ng/helm/utils": ["./libs/ui/utils/src/index.ts"]
     },
     "skipLibCheck": true,
     "target": "ES2022",

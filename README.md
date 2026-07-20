@@ -52,8 +52,8 @@ See [`docs/`](docs/) for the full architectural documentation and development wo
 | --------------- | ------------------------------------------------------------- |
 | Framework       | Angular (standalone components, zoneless)                     |
 | Language        | TypeScript (strict mode)                                      |
-| UI Library      | PrimeNG                                                       |
-| Styling         | SCSS (modern `@use` syntax)                                   |
+| UI Library      | Spartan UI                                                    |
+| Styling         | Tailwind CSS + SCSS (modern `@use` syntax)                    |
 | State           | Angular Signals (signal inputs, signal queries, signal forms) |
 | Data Fetching   | `httpResource`                                                |
 | Template Syntax | Native control flow (`@if`, `@for`, `@switch`, `@defer`)      |
@@ -130,6 +130,9 @@ maintains their own copy.
   // Prettier is the default formatter; formats on save for all file types
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
+
+  // Tailwind CSS IntelliSense recognizes these custom class utility functions
+  "tailwindCSS.classFunctions": ["hlm", "cva", "classes"],
 }
 ```
 
@@ -145,3 +148,9 @@ maintains their own copy.
 
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+
+**💡 Recommended VS Code extensions:**
+
+- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template)
+- [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)

@@ -16,8 +16,8 @@ These tasks establish the repo skeleton. They should be executed in order.
       directories, and a sample schema with inferred type + Vitest test.
 - [x] **T-004** Scaffold `server/` package: Hono on Cloudflare Workers, `wrangler.toml`, `tsconfig.json`,
       `nodejs_compat` + `cloudflare:sockets` config, service-oriented folder structure, sample route + service + Vitest.
-- [x] **T-005** Scaffold `ui/` package: Angular 22 standalone, zoneless, PrimeNG, SCSS, Vitest config, sample standalone
-      component using signals.
+- [x] **T-005** Scaffold `ui/` package: Angular 22 standalone, zoneless, Spartan UI, Tailwind CSS, SCSS, Vitest config,
+      sample standalone component using signals.
 - [x] **T-006** Wire `shared` as a workspace dependency in both `ui/` and `server/`; verify types resolve across
       packages.
 - [x] **T-007** Create GitHub Actions CI workflow: lint → typecheck → unit tests → build for all packages.
@@ -38,7 +38,7 @@ These tasks establish the repo skeleton. They should be executed in order.
 
 - [x] **T-012** Create `.husky/` directory with commit-msg hook
 - [x] **T-013** Create `.vscode/extensions.json` with recommended extensions
-- [x] **T-014** Add PrimeNG theme configuration to `angular.json`
+- [x] **T-014** Add Spartan UI + Tailwind CSS configuration to `angular.json`
 - [x] **T-015** Add favicon.svg to `ui/`
 
 ---

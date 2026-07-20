@@ -9,7 +9,7 @@ Frontend-specific design notes. For the full monorepo architecture, see
 ui/src/
 ├── main.ts              Application bootstrap (bootstrapApplication)
 ├── index.html           HTML entry point
-├── styles.scss          Global styles + CSS custom properties
+├── styles.css           Global styles + CSS custom properties
 ├── test-setup.ts        Vitest setup (imports @angular/compiler)
 └── app/
     ├── app.ts           Root standalone component
@@ -96,26 +96,67 @@ export class HealthResource {
 }
 ```
 
-## PrimeNG Theming and SCSS Organization
+## Spartan UI, Tailwind CSS, and SCSS Organization
 
-**Theme:** Configured at the build level in [`angular.json`](../angular.json).
+**Styling stack:** Tailwind CSS v4 is the primary styling approach. Spartan UI provides accessible, unstyled component
+primitives (helm components). SCSS is used for component-level styles that cannot be expressed with utilities.
 
-**SCSS structure:**
+**Tailwind CSS** is configured in [`src/styles.css`](../src/styles.css) with standard Tailwind v4 imports. PostCSS is
+configured via [`.postcssrc.json`](../.postcssrc.json) with the `@tailwindcss/postcss` plugin.
 
-- [`src/styles.scss`](../src/styles.scss) — Global styles, CSS custom properties
-- Component styles — inline (`styles: [...]`) or external (`styleUrl`)
+**Styles structure:**
+
+- [`src/styles.css`](../src/styles.css) — Global styles, Tailwind CSS imports, CSS custom properties (plain CSS, not
+  SCSS)
+- Component styles — inline (`styles: [...]`) or external (`styleUrl`) using SCSS
 - Use modern Sass `@use` syntax — never global `@import`
 
-**PrimeNG modules:** Import only needed modules in components:
+### Adding a Spartan UI Component
+
+Spartan UI components are generated into [`libs/ui/`](../libs/ui/) and consumed via path aliases configured in
+[`tsconfig.json`](../tsconfig.json).
+
+**Step 1 — Generate the component** (run from the `ui/` directory):
+
+```bash
+npx ng g @spartan-ng/cli:ui <component-name>
+```
+
+For example, to add an alert dialog:
+
+```bash
+npx ng g @spartan-ng/cli:ui alert-dialog
+```
+
+This creates the component source under `libs/ui/alert-dialog/` and registers the path alias
+`@spartan-ng/helm/alert-dialog` in `tsconfig.json`.
+
+**Step 2 — Import in your component:**
 
 ```typescript
-import { ButtonModule } from 'primeng/button';
+import { HlmAlertDialogImports } from '@spartan-ng/helm/alert-dialog';
 
 @Component({
-  imports: [ButtonModule],
+  imports: [HlmAlertDialogImports],
   // ...
 })
 ```
+
+The import name follows the pattern `Hlm<ComponentName>Imports` (e.g. `HlmButtonImports`, `HlmAlertDialogImports`). Each
+component's barrel export in [`libs/ui/<name>/src/index.ts`](../libs/ui/button/src/index.ts) defines this constant.
+
+**Step 3 — Use in the template:**
+
+Each Spartan component has a directive selector (e.g. `hlmBtn`, `hlmAlertDialogOverlay`). Refer to the component source
+in `libs/ui/<name>/src/lib/` for the exact selectors and available inputs.
+
+```html
+<button hlmBtn variant="outline">Click me</button>
+```
+
+> **Note:** If Tailwind styles are not applied to a new component, ensure that the `libs/` directory is listed in the
+> `@source` directive in [`src/styles.css`](../src/styles.css:6). This tells Tailwind to scan the component source files
+> for utility classes used by `class-variance-authority` (CVA).
 
 ## Routing and Lazy-Loading Strategy
 

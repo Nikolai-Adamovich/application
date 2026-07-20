@@ -53,8 +53,8 @@ dependency, eliminating duplicated DTOs.
 | ---------------- | --------------------------------------- |
 | Framework        | Angular 22                              |
 | Language         | TypeScript (strict)                     |
-| UI Library       | PrimeNG                                 |
-| Styling          | SCSS                                    |
+| UI Library       | Spartan UI                              |
+| Styling          | Tailwind CSS + SCSS                     |
 | State            | Angular Signals                         |
 | Forms            | Signal Forms                            |
 | Inputs/Queries   | Signal Inputs, Signal Queries           |
@@ -69,7 +69,6 @@ dependency, eliminating duplicated DTOs.
 - NgRx
 - Template-driven Forms
 - RxJS as state management (RxJS is fine for interop, not as a store)
-- Tailwind CSS
 
 > See [`ui/AGENTS.md`](../ui/AGENTS.md) for the full list (including `@HostBinding`/`@HostListener`, explicit
 > `standalone: true`, etc.).

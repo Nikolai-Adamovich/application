@@ -10,7 +10,7 @@ this file before starting work.
 A greenfield educational full-stack application for learning modern development, AI-assisted workflows, and multi-agent
 software development.
 
-- **Frontend:** Angular 22 (standalone, signals, zoneless) + PrimeNG + SCSS
+- **Frontend:** Angular 22 (standalone, signals, zoneless) + Spartan UI + Tailwind CSS + SCSS
 - **Backend:** Hono on Cloudflare Workers + MongoDB Atlas (official driver)
 - **Shared:** TypeScript contracts, Zod schemas, shared types
 - **Monorepo:** npm workspaces (`shared/`, `ui/`, `server/`)
