@@ -165,9 +165,160 @@ The project prefix is `ui` (enforced by the [`component-selector`](eslint.config
 - Use modern Sass `@use` syntax — never global `@import`.
 - **Tailwind CSS v4** is the primary styling approach. Use Tailwind utility classes in templates. SCSS is used for
   complex custom styles that cannot be expressed with utilities.
-- **Spartan UI** provides accessible, unstyled component primitives (helm components). Import only the modules you need
-  per component (e.g. `import { HlmButtonImports } from '@spartan-ng/helm/button'`). See
-  [`docs/architecture.md`](docs/architecture.md#adding-a-spartan-ui-component) for the full guide on adding components.
+
+---
+
+## Spartan UI Components
+
+**Spartan UI** provides accessible, unstyled component primitives (helm components). Import only the modules you need
+per component (e.g. `import { HlmButtonImports } from '@spartan-ng/helm/button'`). See
+[`docs/architecture.md`](docs/architecture.md#adding-a-spartan-ui-component) for the full guide on adding components.
+
+### Adding a new Spartan UI component
+
+```bash
+cd ui && npx ng g @spartan-ng/cli:ui <component-name> --defaults
+```
+
+This generates the component in [`libs/ui/<component>/`](libs/ui/) and updates [`tsconfig.json`](tsconfig.json) with the
+path mapping for `@spartan-ng/helm/<component>`.
+
+### Important: `verbatimModuleSyntax` in generated code
+
+Spartan CLI generates code that may not use `import type` for type-only imports (required by `verbatimModuleSyntax` in
+[`tsconfig.base.json`](../tsconfig.base.json)). After generating a new component, **check and fix** any `import type`
+issues in the generated files before committing. Common fixes:
+
+```typescript
+// ❌ Generated code
+import { HlmCardConfig, injectHlmCardConfig } from './hlm-card.token';
+import { cva, VariantProps } from 'class-variance-authority';
+
+// ✅ Fixed
+import { type HlmCardConfig, injectHlmCardConfig } from './hlm-card.token';
+import { cva, type VariantProps } from 'class-variance-authority';
+```
+
+### ESLint rules for `libs/`
+
+The spartan-generated code in [`libs/`](libs/ui/) uses `hlm-` selectors and different formatting conventions. Relaxed
+ESLint rules are configured in [`eslint.config.js`](eslint.config.js) for `libs/**/*.ts` — selector prefix rules and
+stylistic rules are disabled for that directory.
+
+### Available Spartan UI components
+
+| Package                   | Import             | Key directives                       |
+| ------------------------- | ------------------ | ------------------------------------ |
+| `@spartan-ng/helm/button` | `HlmButtonImports` | `hlmBtn`                             |
+| `@spartan-ng/helm/card`   | `HlmCardImports`   | `hlmCard`, `hlmCardHeader`, etc.     |
+| `@spartan-ng/helm/tabs`   | `HlmTabsImports`   | `hlmTabs`, `hlmTabsList`, etc.       |
+| `@spartan-ng/helm/input`  | `HlmInputImports`  | `hlmInput`                           |
+| `@spartan-ng/helm/label`  | `HlmLabelImports`  | `hlmLabel`                           |
+| `@spartan-ng/helm/field`  | `HlmFieldImports`  | `hlm-field`, `hlm-field-error`, etc. |
+
+---
+
+## Angular 22 Signal Forms
+
+Signal Forms (`@angular/forms/signals`) are the **only** allowed form approach. Template-driven forms and Reactive Forms
+(`FormGroup`/`FormControl`) are **forbidden**.
+
+### Key imports
+
+```typescript
+import {
+  form,
+  schema,
+  required,
+  email,
+  minLength,
+  maxLength,
+  validate,
+  submit,
+  FormField,
+  FormRoot,
+} from '@angular/forms/signals';
+```
+
+### Creating a form
+
+```typescript
+interface LoginModel {
+  email: string;
+  password: string;
+}
+
+@Component({/* ... */})
+export class LoginComponent {
+  private readonly model: WritableSignal<LoginModel> = signal({ email: '', password: '' });
+
+  protected readonly loginForm = form(
+    this.model,
+    schema<LoginModel>((field) => {
+      required(field.email, { message: 'Email is required.' });
+      email(field.email, { message: 'Please enter a valid email address.' });
+      required(field.password, { message: 'Password is required.' });
+      minLength(field.password, 8, { message: 'Password must be at least 8 characters.' });
+    }),
+    {
+      submission: {
+        action: async () => {
+          const { email, password } = this.model();
+          // call API
+        },
+      },
+    },
+  );
+}
+```
+
+### Template usage
+
+Use `FormRoot` on `<form>`, `FormField` on inputs, and `HlmFieldImports` for error display:
+
+```html
+<form [formRoot]="loginForm" id="form-login">
+  <hlm-field-group>
+    <hlm-field>
+      <label hlmFieldLabel for="email">Email</label>
+      <input hlmInput id="email" type="email" [formField]="loginForm.email" />
+      @for (error of loginForm.email().errors(); track error.kind) {
+      <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+      }
+    </hlm-field>
+  </hlm-field-group>
+</form>
+<button hlmBtn type="submit" form="form-login">Submit</button>
+```
+
+### Key concepts
+
+- **`form(signal, schema, options?)`** — creates a `FieldTree<T>` from a model signal and validation schema.
+- **`schema<T>((field) => { ... })`** — defines validation rules declaratively using `required()`, `email()`,
+  `minLength()`, etc.
+- **Validators accept `{ message: string }`** — the message is available as `error.message` in templates.
+- **`FormRoot`** directive — sets `novalidate` on the form and handles submission via `submission` option.
+- **`FormField`** directive — two-way binds a `FieldTree` leaf to a native `<input>` or custom control.
+- **`submit(form, action?)`** — marks all fields as touched and runs the action if valid.
+- **`FieldTree`** — callable (returns `FieldState`) and navigable (`.email`, `.password` for sub-fields).
+- **`FieldState`** — `.value()`, `.errors()`, `.touched()`, `.dirty()` signals.
+- **Cross-field validation** — use `validate(field.confirmPassword, ({ value }) => { ... })` with a closure over the
+  model signal.
+
+### Required component imports
+
+```typescript
+imports: [FormField, FormRoot, HlmFieldImports, HlmInputImports /* ... */];
+```
+
+> **Note:** `FormField` and `FormRoot` are standalone directives from `@angular/forms/signals` — no module-level
+> providers needed.
+
+### Submit pattern
+
+Use the `submission` option in `form()` for automatic form handling. The `FormRoot` directive intercepts the native
+`submit` event, prevents default, and calls `submit()` if `submission.action` is configured. Use `form="form-id"` on
+submit buttons outside the `<form>` tag (e.g., in `hlm-card-footer`).
 
 ---
 
