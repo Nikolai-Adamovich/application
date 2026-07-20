@@ -52,6 +52,17 @@ that package.
 5. The agent opens a PR; the Architect reviews for architectural consistency.
 6. Only the Architect may modify architecture documentation and decisions.
 
+### Pre-commit checklist
+
+Before every commit, the agent **must** run all three checks from the repository root and confirm they pass:
+
+1. **`npm run lint`** — ESLint across the monorepo must exit with code 0.
+2. **`npm run typecheck`** — TypeScript strict checks across all workspaces must exit with code 0.
+3. **`cd ui && npm run build`** — the Angular project must build without errors.
+
+A commit that breaks any of these checks will be rejected by the Architect during PR review. Do not bypass pre-commit
+hooks (`--no-verify`).
+
 Implementation agents MUST NOT:
 
 - Modify files under [`docs/`](docs/) without Architect approval.
