@@ -165,6 +165,50 @@ Run from the repository root. Each package also has package-specific scripts doc
 
 ---
 
+## Documentation Lookup
+
+AI agents have access to multiple documentation sources. **Always prefer specialised tools over generic search or
+outdated training data** when working with rapidly evolving APIs.
+
+### Angular
+
+For any Angular-related task (components, signals, httpResource, forms, SSR, routing, testing, CLI commands, best
+practices):
+
+1. **Angular CLI MCP server** (`mcp--angular-cli--*`) — use the following tools as appropriate:
+   - `mcp--angular-cli--search_documentation` — search angular.dev for APIs, concepts, and tutorials.
+   - `mcp--angular-cli--get_best_practices` — retrieve the official Angular Best Practices Guide.
+   - `mcp--angular-cli--list_projects` — discover workspaces, projects, and targets before running builds/tests.
+   - `mcp--angular-cli--run_target` — execute build, test, lint, or e2e targets.
+   - `mcp--angular-cli--devserverstart` / `devserverstop` / `devserverwait_for_build` — manage the dev server lifecycle.
+2. **Angular developer skill** (`skill("angular-developer", ...)`) — load for architectural guidance, code generation,
+   and best practices when creating or modifying Angular components, services, or configuration.
+
+### Spartan UI
+
+For any Spartan UI / `@spartan-ng` task (components, blocks, theming, dark mode, accessibility, CLI generators):
+
+1. **Spartan UI MCP server** (`mcp--spartan-ui--*`) — use the following tools as appropriate:
+   - `mcp--spartan-ui--spartan_components_list` / `spartan_components_get` — discover and inspect component APIs.
+   - `mcp--spartan-ui--spartan_blocks_list` / `spartan_blocks_get` — discover and inspect pre-built blocks.
+   - `mcp--spartan-ui--spartan_docs_get` — fetch official docs sections (installation, theming, dark-mode, etc.).
+   - `mcp--spartan-ui--spartan_components_dependencies` / `spartan_blocks_dependencies` — analyse dependency
+     requirements.
+   - `mcp--spartan-ui--spartan_accessibility_check` — verify accessibility features of a component.
+   - `mcp--spartan-ui--spartan_health_check` / `spartan_health_command` — run or inspect health checks.
+2. **Spartan skill** (`skill("spartan", ...)`) — load for project context, component APIs, usage examples, and guidance
+   on composing Brain (headless) and Helm (styled) layers.
+
+### Other Libraries (Context7)
+
+For all other project technologies — **Hono**, **MongoDB**, **TypeScript**, **Zod**, **Vitest**, **Tailwind CSS**, and
+any other library used in the project — use the **Context7 MCP server**:
+
+1. **`mcp--context7--resolve-library-id`** — resolve a library name to a Context7-compatible ID.
+2. **`mcp--context7--query-docs`** — retrieve documentation and code snippets for the resolved library.
+
+---
+
 ## Communication
 
 When proposing changes, agents must:

@@ -154,3 +154,51 @@ maintains their own copy.
 
 - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template)
 - [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
+
+## 🤖 AI Development
+
+When developing with AI coding agents (e.g. Cursor, Roo Code, Cline, GitHub Copilot), it is recommended to configure
+three MCP servers that provide up-to-date documentation and tooling for the technologies used in this project.
+
+### MCP Servers
+
+| Server      | Package                 | Purpose                                                              |
+| ----------- | ----------------------- | -------------------------------------------------------------------- |
+| Angular CLI | `@angular/cli`          | Angular docs, best practices, project discovery, builds, tests       |
+| Spartan UI  | `@spartan-ng/mcp`       | Spartan UI component APIs, blocks, theming, accessibility checks     |
+| Context7    | `@upstash/context7-mcp` | Hono, MongoDB, TypeScript, Zod, Vitest, Tailwind CSS, and other libs |
+
+### Configuration
+
+Add the following to your MCP configuration:
+
+```jsonc
+{
+  "mcpServers": {
+    "angular-cli": {
+      "command": "npx",
+      "args": ["-y", "@angular/cli", "mcp"],
+    },
+    "spartan-ui": {
+      "command": "npx",
+      "args": ["-y", "@spartan-ng/mcp"],
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+    },
+  },
+}
+```
+
+### What each server provides
+
+- **Angular CLI** — search angular.dev docs, retrieve best practices, discover workspaces/projects, run build/test/lint
+  targets, and manage the dev server lifecycle.
+- **Spartan UI** — list and inspect components and blocks, fetch official docs (installation, theming, dark mode),
+  analyse dependencies, and verify accessibility features.
+- **Context7** — resolve any library to a Context7-compatible ID and retrieve current documentation and code snippets.
+  Used for Hono, MongoDB, TypeScript, Zod, Vitest, Tailwind CSS, and any other dependency not covered by the two
+  specialised servers above.
+
+See [`AGENTS.md`](AGENTS.md) for full details on how AI agents should use these servers during development.
