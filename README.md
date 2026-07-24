@@ -2,27 +2,14 @@
 
 > 🌐 **Live application:** [**https://app-board.pages.dev/**](https://app-board.pages.dev/)
 
-**Task Board** is a cloud-based platform for project management, task tracking, and team collaboration.
+**Task Board** is a cloud-based project management platform for task tracking and team collaboration. Organizations
+create isolated workspaces to manage multiple projects, plan and prioritize work, assign tasks, and track progress.
+Teams organize work using boards and task workflows, collaborate via comments, track deadlines, and monitor project
+health through dashboards and reporting.
 
-The platform enables organizations to create dedicated workspaces, manage multiple projects, plan and prioritize work,
-assign tasks, and monitor progress through a centralized environment. Each customer operates within an isolated
-workspace with configurable users, roles, permissions, and project-level access controls.
-
-**Task Board** provides teams with tools for organizing work using boards and task workflows, collaborating through
-comments and discussions, tracking deadlines, and maintaining visibility across ongoing initiatives. Managers and
-stakeholders can monitor project health, team workload, task completion rates, and key performance indicators through
-dashboards and reporting tools.
-
-Designed for organizations of all sizes, the platform supports multi-project environments where users may have access to
-specific projects or entire workspaces depending on their responsibilities. Flexible role-based access control ensures
-that each user can view and manage only the information relevant to their role.
-
-**Task Board** is built as a multi-tenant SaaS platform with a modular architecture. The core product focuses on project
-and task management, while additional modules can extend the platform with advanced analytics, reporting, knowledge
-management, time tracking, integrations, and other business capabilities.
-
-The goal of **Task Board** is to provide organizations with a single, scalable workspace for planning, coordinating, and
-delivering work efficiently across teams and projects.
+Built as a multi-tenant SaaS with role-based access control, each user sees only what's relevant to their role. The
+modular architecture starts with core project and task management, with optional extensions for analytics, reporting,
+time tracking, and integrations.
 
 ## 📦 Packages
 
