@@ -70,8 +70,8 @@ dependency, eliminating duplicated DTOs.
 - Template-driven Forms
 - RxJS as state management (RxJS is fine for interop, not as a store)
 
-> See [`ui/AGENTS.md`](../ui/AGENTS.md) for the full list (including `@HostBinding`/`@HostListener`, explicit
-> `standalone: true`, etc.).
+> For Angular best practices, Signal Forms usage, and Spartan UI component APIs, use the MCP tools documented in
+> [`AGENTS.md`](../AGENTS.md#documentation-lookup). Do not rely on training data — these APIs evolve rapidly.
 
 ### Deployment
 
@@ -113,7 +113,8 @@ option that routes TCP through `cloudflare:sockets`.
 - Prisma
 - Express / Fastify (Hono is the only HTTP framework)
 
-> See [`server/AGENTS.md`](../server/AGENTS.md) for the full list.
+> For Hono and MongoDB driver specifics, use the Context7 MCP tools documented in
+> [`AGENTS.md`](../AGENTS.md#documentation-lookup).
 
 ---
 
@@ -198,4 +199,3 @@ Deploy automatically after a successful CI run on the main branch.
 2. **Single source of truth.** One schema → inferred types → reused everywhere.
 3. **Thin edges, rich services.** Handlers validate and delegate; logic lives in services.
 4. **No premature abstraction.** Add patterns only when the need is concrete.
-5. **Long-term maintainability.** Every decision is recorded and reversible.

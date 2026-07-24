@@ -31,78 +31,27 @@ ui/src/
 
 > Do **not** use the legacy `*.component.ts` suffix for components.
 
-## Signal-Based State Management Patterns
+## Signal-Based State Management
 
 **State ownership:** Services own state; components consume signals from services.
 
-**Pattern** (using the `@Service` decorator):
+**Pattern:** Use the `@Service` decorator to register singleton services. Services expose readonly signals and mutation
+methods. Components inject services and consume their signals in templates.
 
-```typescript
-import { Service } from '@angular/core';
+> For detailed Signal Forms API, `computed()`, `effect()`, and signal best practices, use the Angular CLI MCP tools
+> documented in [`AGENTS.md`](../AGENTS.md#documentation-lookup).
 
-@Service()
-export class CounterService {
-  private readonly _count = signal(0);
-  readonly count = this._count.asReadonly();
+## Data Fetching
 
-  increment(): void {
-    this._count.update((n) => n + 1);
-  }
-}
-```
+Use `httpResource` as the primary data-fetching tool. Validate responses with shared Zod schemas from `@app/shared`.
 
-**Component consumption:**
+> For `httpResource` usage patterns and `rxResource` integration, use the Angular CLI MCP tools documented in
+> [`AGENTS.md`](../AGENTS.md#documentation-lookup).
 
-```typescript
-import { Component, inject } from '@angular/core';
-
-@Component({
-  selector: 'ui-counter',
-  template: `Count: {{ count() }}`,
-})
-export class Counter {
-  readonly count = inject(CounterService).count;
-}
-```
-
-> Note: `standalone: true` and `changeDetection: ChangeDetectionStrategy.OnPush` are omitted — they are defaults in
-> Angular 22+.
-
-## Data Fetching with `httpResource`
-
-Use [`httpResource`](../AGENTS.md#data-fetching--mutations) as the primary data-fetching tool. Validate responses with
-shared Zod schemas from `@app/shared`:
-
-```typescript
-import { httpResource } from '@angular/common/http';
-import { healthSchema } from '@app/shared';
-
-export class HealthResource {
-  readonly health = httpResource(() => '/api/health', {
-    parse: (raw) => healthSchema.parse(raw),
-  });
-}
-```
-
-**Template usage:**
-
-```html
-@if (health.value(); as data) {
-<p>Status: {{ data.status }}</p>
-} @else if (health.isLoading()) {
-<p>Loading…</p>
-} @else if (health.error(); as error) {
-<p>Error: {{ error.message }}</p>
-}
-```
-
-## Spartan UI, Tailwind CSS, and SCSS Organization
+## Styling Stack
 
 **Styling stack:** Tailwind CSS v4 is the primary styling approach. Spartan UI provides accessible, unstyled component
 primitives (helm components). SCSS is used for component-level styles that cannot be expressed with utilities.
-
-**Tailwind CSS** is configured in [`src/styles.css`](../src/styles.css) with standard Tailwind v4 imports. PostCSS is
-configured via [`.postcssrc.json`](../.postcssrc.json) with the `@tailwindcss/postcss` plugin.
 
 **Styles structure:**
 
@@ -111,52 +60,42 @@ configured via [`.postcssrc.json`](../.postcssrc.json) with the `@tailwindcss/po
 - Component styles — inline (`styles: [...]`) or external (`styleUrl`) using SCSS
 - Use modern Sass `@use` syntax — never global `@import`
 
-### Adding a Spartan UI Component
+> For Tailwind CSS configuration and advanced styling patterns, use the Context7 MCP tools documented in
+> [`AGENTS.md`](../AGENTS.md#documentation-lookup).
+
+## Spartan UI
 
 Spartan UI components are generated into [`libs/ui/`](../libs/ui/) and consumed via path aliases configured in
 [`tsconfig.json`](../tsconfig.json).
 
-**Step 1 — Generate the component** (run from the `ui/` directory):
+**Generate a component** (run from the `ui/` directory):
 
 ```bash
 npx ng g @spartan-ng/cli:ui <component-name>
 ```
 
-For example, to add an alert dialog:
+This creates the component source under `libs/ui/<component>/` and registers the path alias
+`@spartan-ng/helm/<component>` in `tsconfig.json`.
 
-```bash
-npx ng g @spartan-ng/cli:ui alert-dialog
-```
-
-This creates the component source under `libs/ui/alert-dialog/` and registers the path alias
-`@spartan-ng/helm/alert-dialog` in `tsconfig.json`.
-
-**Step 2 — Import in your component:**
+**Import in your component:**
 
 ```typescript
-import { HlmAlertDialogImports } from '@spartan-ng/helm/alert-dialog';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
 
 @Component({
-  imports: [HlmAlertDialogImports],
+  imports: [HlmButtonImports],
   // ...
 })
 ```
 
-The import name follows the pattern `Hlm<ComponentName>Imports` (e.g. `HlmButtonImports`, `HlmAlertDialogImports`). Each
-component's barrel export in [`libs/ui/<name>/src/index.ts`](../libs/ui/button/src/index.ts) defines this constant.
-
-**Step 3 — Use in the template:**
-
-Each Spartan component has a directive selector (e.g. `hlmBtn`, `hlmAlertDialogOverlay`). Refer to the component source
-in `libs/ui/<name>/src/lib/` for the exact selectors and available inputs.
-
-```html
-<button hlmBtn variant="outline">Click me</button>
-```
+The import name follows the pattern `Hlm<ComponentName>Imports` (e.g. `HlmButtonImports`, `HlmAlertDialogImports`).
 
 > **Note:** If Tailwind styles are not applied to a new component, ensure that the `libs/` directory is listed in the
 > `@source` directive in [`src/styles.css`](../src/styles.css:6). This tells Tailwind to scan the component source files
 > for utility classes used by `class-variance-authority` (CVA).
+
+> For Spartan UI component APIs, blocks, theming, dark mode, and accessibility, use the Spartan UI MCP tools documented
+> in [`AGENTS.md`](../AGENTS.md#documentation-lookup).
 
 ## Routing and Lazy-Loading Strategy
 

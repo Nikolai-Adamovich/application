@@ -23,8 +23,7 @@ ESLint/Prettier, Conventional Commits, Vitest, shared contracts) that this guide
 
 - **Standalone components** only
 - **Signals** for all state management
-- **Signal Inputs**, **Signal Queries**, and **Signal Forms** (`@angular/forms/signals`, using the `form()` function to
-  build strongly-typed `FieldTree` models)
+- **Signal Inputs**, **Signal Queries**, and **Signal Forms** (`@angular/forms/signals`)
 - **`httpResource`** as the primary tool for data fetching
 - Native control flow: `@if`, `@for`, `@switch`
 - Deferrable views (`@defer`) for lazy loading
@@ -122,57 +121,16 @@ The project prefix is `ui` (enforced by the [`component-selector`](eslint.config
 - Keep data fetching and mutation logic inside services
 - Validate API responses with shared Zod schemas from `@app/shared` before consuming them
 
----
-
-## Components
-
-- Small, focused on a single responsibility
-- Use `[class]` and `[style]` bindings instead of `ngClass` / `ngStyle`
-- Manage local UI-state with signals
+> For detailed `httpResource` usage, Signal Forms API, and Angular best practices, use the Angular CLI MCP tools
+> documented in [`AGENTS.md`](../AGENTS.md#documentation-lookup). Do not rely on training data — these APIs evolve
+> rapidly.
 
 ---
 
-## State Management
-
-- **Signals only**
-- Use `computed()` for derived values
-- Prefer `set()` and `update()` over direct state mutation
-- Services act as the single source of truth
-
----
-
-## Templates
-
-- Keep templates simple, declarative, and readable
-- Avoid complex logic, calculations, or method calls inside templates
-- Use native control flow syntax (`@if`, `@for` with track expression)
-- Do not rely on global objects like `new Date()` directly in templates (wrap in computed signals or pipes)
-
----
-
-## Services
-
-- Follow single responsibility principle
-- Provide services at root level using `@Service` decorator
-- Handle side effects within services using `effect()` only when syncing state with external APIs
-
----
-
-## Styling
-
-- Global styles live in [`src/styles.css`](src/styles.css).
-- Component styles are inline (`styles: [...]`) or external (`styleUrl`).
-- Use modern Sass `@use` syntax — never global `@import`.
-- **Tailwind CSS v4** is the primary styling approach. Use Tailwind utility classes in templates. SCSS is used for
-  complex custom styles that cannot be expressed with utilities.
-
----
-
-## Spartan UI Components
+## Spartan UI
 
 **Spartan UI** provides accessible, unstyled component primitives (helm components). Import only the modules you need
-per component (e.g. `import { HlmButtonImports } from '@spartan-ng/helm/button'`). See
-[`docs/architecture.md`](docs/architecture.md#adding-a-spartan-ui-component) for the full guide on adding components.
+per component (e.g. `import { HlmButtonImports } from '@spartan-ng/helm/button'`).
 
 ### Adding a new Spartan UI component
 
@@ -187,17 +145,7 @@ path mapping for `@spartan-ng/helm/<component>`.
 
 Spartan CLI generates code that may not use `import type` for type-only imports (required by `verbatimModuleSyntax` in
 [`tsconfig.base.json`](../tsconfig.base.json)). After generating a new component, **check and fix** any `import type`
-issues in the generated files before committing. Common fixes:
-
-```typescript
-// ❌ Generated code
-import { HlmCardConfig, injectHlmCardConfig } from './hlm-card.token';
-import { cva, VariantProps } from 'class-variance-authority';
-
-// ✅ Fixed
-import { type HlmCardConfig, injectHlmCardConfig } from './hlm-card.token';
-import { cva, type VariantProps } from 'class-variance-authority';
-```
+issues in the generated files before committing.
 
 ### ESLint rules for `libs/`
 
@@ -205,120 +153,22 @@ The spartan-generated code in [`libs/`](libs/ui/) uses `hlm-` selectors and diff
 ESLint rules are configured in [`eslint.config.js`](eslint.config.js) for `libs/**/*.ts` — selector prefix rules and
 stylistic rules are disabled for that directory.
 
-### Available Spartan UI components
-
-| Package                   | Import             | Key directives                       |
-| ------------------------- | ------------------ | ------------------------------------ |
-| `@spartan-ng/helm/button` | `HlmButtonImports` | `hlmBtn`                             |
-| `@spartan-ng/helm/card`   | `HlmCardImports`   | `hlmCard`, `hlmCardHeader`, etc.     |
-| `@spartan-ng/helm/tabs`   | `HlmTabsImports`   | `hlmTabs`, `hlmTabsList`, etc.       |
-| `@spartan-ng/helm/input`  | `HlmInputImports`  | `hlmInput`                           |
-| `@spartan-ng/helm/label`  | `HlmLabelImports`  | `hlmLabel`                           |
-| `@spartan-ng/helm/field`  | `HlmFieldImports`  | `hlm-field`, `hlm-field-error`, etc. |
+> For Spartan UI component APIs, blocks, theming, dark mode, and accessibility, use the Spartan UI MCP tools documented
+> in [`AGENTS.md`](../AGENTS.md#documentation-lookup). Do not rely on training data — the component API surface evolves
+> rapidly.
 
 ---
 
-## Angular 22 Signal Forms
+## Styling
 
-Signal Forms (`@angular/forms/signals`) are the **only** allowed form approach. Template-driven forms and Reactive Forms
-(`FormGroup`/`FormControl`) are **forbidden**.
+- Global styles live in [`src/styles.css`](src/styles.css).
+- Component styles are external (`styleUrl`).
+- Use modern Sass `@use` syntax — never global `@import`.
+- **Tailwind CSS v4** is the primary styling approach. Use Tailwind utility classes in templates. SCSS is used for
+  complex custom styles that cannot be expressed with utilities.
 
-### Key imports
-
-```typescript
-import {
-  form,
-  schema,
-  required,
-  email,
-  minLength,
-  maxLength,
-  validate,
-  submit,
-  FormField,
-  FormRoot,
-} from '@angular/forms/signals';
-```
-
-### Creating a form
-
-```typescript
-interface LoginModel {
-  email: string;
-  password: string;
-}
-
-@Component({/* ... */})
-export class LoginComponent {
-  private readonly model: WritableSignal<LoginModel> = signal({ email: '', password: '' });
-
-  protected readonly loginForm = form(
-    this.model,
-    schema<LoginModel>((field) => {
-      required(field.email, { message: 'Email is required.' });
-      email(field.email, { message: 'Please enter a valid email address.' });
-      required(field.password, { message: 'Password is required.' });
-      minLength(field.password, 8, { message: 'Password must be at least 8 characters.' });
-    }),
-    {
-      submission: {
-        action: async () => {
-          const { email, password } = this.model();
-          // call API
-        },
-      },
-    },
-  );
-}
-```
-
-### Template usage
-
-Use `FormRoot` on `<form>`, `FormField` on inputs, and `HlmFieldImports` for error display:
-
-```html
-<form [formRoot]="loginForm" id="form-login">
-  <hlm-field-group>
-    <hlm-field>
-      <label hlmFieldLabel for="email">Email</label>
-      <input hlmInput id="email" type="email" [formField]="loginForm.email" />
-      @for (error of loginForm.email().errors(); track error.kind) {
-      <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
-      }
-    </hlm-field>
-  </hlm-field-group>
-</form>
-<button hlmBtn type="submit" form="form-login">Submit</button>
-```
-
-### Key concepts
-
-- **`form(signal, schema, options?)`** — creates a `FieldTree<T>` from a model signal and validation schema.
-- **`schema<T>((field) => { ... })`** — defines validation rules declaratively using `required()`, `email()`,
-  `minLength()`, etc.
-- **Validators accept `{ message: string }`** — the message is available as `error.message` in templates.
-- **`FormRoot`** directive — sets `novalidate` on the form and handles submission via `submission` option.
-- **`FormField`** directive — two-way binds a `FieldTree` leaf to a native `<input>` or custom control.
-- **`submit(form, action?)`** — marks all fields as touched and runs the action if valid.
-- **`FieldTree`** — callable (returns `FieldState`) and navigable (`.email`, `.password` for sub-fields).
-- **`FieldState`** — `.value()`, `.errors()`, `.touched()`, `.dirty()` signals.
-- **Cross-field validation** — use `validate(field.confirmPassword, ({ value }) => { ... })` with a closure over the
-  model signal.
-
-### Required component imports
-
-```typescript
-imports: [FormField, FormRoot, HlmFieldImports, HlmInputImports /* ... */];
-```
-
-> **Note:** `FormField` and `FormRoot` are standalone directives from `@angular/forms/signals` — no module-level
-> providers needed.
-
-### Submit pattern
-
-Use the `submission` option in `form()` for automatic form handling. The `FormRoot` directive intercepts the native
-`submit` event, prevents default, and calls `submit()` if `submission.action` is configured. Use `form="form-id"` on
-submit buttons outside the `<form>` tag (e.g., in `hlm-card-footer`).
+> For Tailwind CSS configuration and advanced styling patterns, use the Context7 MCP tools documented in
+> [`AGENTS.md`](../AGENTS.md#documentation-lookup).
 
 ---
 

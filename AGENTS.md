@@ -1,7 +1,7 @@
 # AGENTS.md — Project Coordination Guide
 
-This file is the single source of truth for how agents collaborate on this project. All implementation agents MUST read
-this file before starting work.
+Single source of truth for how agents collaborate on this project. All implementation agents MUST read this file before
+starting work.
 
 ---
 
